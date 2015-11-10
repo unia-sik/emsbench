@@ -1,0 +1,44 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% $Id: port.tex 332 2015-06-30 08:59:57Z klugeflo $
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Porting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+To port EMSbench to a new platform \verb+$NPF+, take the following steps:
+\begin{enumerate}
+\item Create copy of the \verb+embedded/arch/default/+ directory, or
+  create the \verb+embedded/arch/$NPF+ structure from scratch.
+\item Copy the include files from the \verb+default+ directory. Adjust
+  appropriately, if you want to use macros instead of function calls
+  in places.
+\item Implement the remaining functions in the appropriate \verb+hal*/+
+  directories.
+  Make sure to follow the callback functions in your interrupt
+  handlers.
+\item If your platform needs a \ac{bsp}, place it inside the
+  \verb+bsp+ directory.
+  Also, make an approriate \verb+Makefile+ available.
+\item Write the configuration files for \verb+make+ according to
+  sect.~\ref{ss:benv:pspec}.
+\item If necessary, add further compilation parameters to the relevant
+  \verb+make+ flags (e.g. \verb$CFLAGS += ...$).
+\item Add your platform to the \code{PLATFORMS} array in
+  \verb+/builder/data.py+.
+  If your platform requires building of an additional \ac{bsp}, set
+  the second parameter to \verb+True+.
+  The build process will use the \verb+Makefile+ in the platform's
+  \verb+bsp/+ subdirectory.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: porting
+%%% TeX-PDF-mode: t
+%%% End: 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%<!-- Local IspellDict: english -->

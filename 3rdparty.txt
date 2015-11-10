@@ -1,0 +1,15 @@
+$Id: 3rdparty.txt 336 2015-07-02 14:21:45Z klugeflo $
+
+EMSBench contains the following 3rd-party software:
+- libopencm3 (http://libopencm3.org/) for low-level HAL in the
+  stm32f4-discovery HAL implementation (licensed under LGPL v3 or later)
+- ub_stm32f4_usb_cdc
+  (http://mikrocontroller.bplaced.net/wordpress/?page_id=744)
+  for serial communication over USB in the stm32f4-discovery HAL
+  implementation (free use without warranty, see
+  http://mikrocontroller.bplaced.net/wordpress/?page_id=10)
+- Low-level code for initialisation of NIOS2 system by Altera for
+  NIOS2 HAL implementation (see copyright notes in
+  embedded/arch/nios2/bsp/arch/nios2/* files)
+
+

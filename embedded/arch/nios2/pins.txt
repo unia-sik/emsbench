@@ -1,0 +1,11 @@
+$Id: pins.txt 386 2015-10-01 15:18:34Z meixnean $
+
+red: Primyry RPM Signal
+black: Secondary RPM Signal
+       TG     EMS
+
+red    IO_B8  IO_A0
+black  IO_B9  IO_A1
+
+Ignition output signals
+GPIOC pins 1 to 6 (IO_A26 - IO_A31)

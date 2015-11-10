@@ -1,0 +1,149 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% $Id: directories.tex 332 2015-06-30 08:59:57Z klugeflo $
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Directory Structure}
+\label{s:directories}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The directory structure of \eb is depicted in
+figure~\ref{f:directories}.
+The root directory contains two python scripts for building the
+embedded \ac{ems} and \ac{tg}.
+Relevant library functions are located in the \verb+/builder/+ directory.
+The \verb+/data/+ directory contains driving cycles and car data that
+can be used during generation of the trace generator.
+The preprocessor for the trace generator is located in \verb+/tgpp/+.
+It is intended to be executed on the host platform that is used to
+build the embedded code.
+
+% from http://tex.stackexchange.com/a/173770
+\tikzstyle{every node}=[thick,anchor=west, rounded corners,
+  font={\scriptsize\ttfamily}, inner sep=2.5pt]
+\tikzstyle{selected}=[draw=blue,fill=blue!10]
+\tikzstyle{dir}=[draw=blue,fill=blue!10]
+\tikzstyle{root}=[dir, fill=blue!30]
+
+% from http://www.texample.net/tikz/examples/filesystem-tree/
+\tikzstyle{every node}=[draw=black,thick,anchor=west]
+\tikzstyle{selected}=[draw=red,fill=red!30]
+\tikzstyle{optional}=[dashed,fill=gray!50]
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[%
+  grow via three points={one child at (0.5,-0.7) and
+  two children at (0.5,-0.7) and (0.5,-1.4)},
+  edge from parent path={(\tikzparentnode.south) |- (\tikzchildnode.west)}]
+
+    \node [root] {\eb}
+    child { node [dir] {builder} }
+    child { node [dir] {data} }
+    child { node [dir] {doc}
+      child { node [dir] {porting} }
+      child { node [dir] {tg} }
+    }
+    child [missing] {}
+    child [missing] {}
+    child { node [dir] {embedded}
+      child { node [dir] {arch}
+        child { node [dir] {default}
+          child { node [dir] {bsp}
+            child { node [dir] {lib}}
+          }
+          child [missing] {}
+          child { node [dir] {conf}}
+          child { node [dir] {hal}}
+          child { node [dir] {hal-ems}}
+          child { node [dir] {hal-tg}}
+          child { node [dir] {include}
+            child { node [dir] {ems}}
+            child { node [dir] {tg}}
+          }
+        }
+        child [missing] {}
+        child [missing] {}
+        child [missing] {}
+        child [missing] {}
+        child [missing] {}
+        child [missing] {}
+        child [missing] {}
+        child [missing] {}
+        child [missing] {}
+        child { node [dir] {\$ARCH}}
+      }
+      child [missing] {}
+      child [missing] {}
+      child [missing] {}
+      child [missing] {}
+      child [missing] {}
+      child [missing] {}
+      child [missing] {}
+      child [missing] {}
+      child [missing] {}
+      child [missing] {}
+      child [missing] {}
+      child { node [dir] {build}
+        child { node [dir] {\$ARCH-\$APP}
+          child { node [dir] {hal}}
+          child { node [dir] {hal-\$APP}}
+          child { node [dir] {\$APP}}
+        }
+      }
+      child [missing] {}
+      child [missing] {}
+      child { node [dir] {ems}}
+      child { node [dir] {tg}}
+    }
+    child [missing] {}
+    child [missing] {}
+    child [missing] {}
+    child [missing] {}
+    child [missing] {}
+    child [missing] {}
+    child [missing] {}
+    child [missing] {}
+    child [missing] {}
+    child [missing] {}
+    child [missing] {}
+    child [missing] {}
+    child [missing] {}
+    child [missing] {}
+    child [missing] {}
+    child [missing] {}
+    child [missing] {}
+    child { node [dir] {tgpp}}
+    ;
+
+  \end{tikzpicture}
+
+  \caption{Directory structure of \eb}
+  \label{f:directories}
+\end{figure}
+
+The platform-independent code for \ac{ems} and \ac{tg} is located in
+the corresponding subdirectories inside \verb+/embedded/+.
+The \verb+/embedded/arch/default/+ directory acts as a blueprint for
+the implementation of a platform-specific \ac{hal}.
+The required interfaces for the application-specific \acp{hal} are
+specified inside the \verb+include/+ directory.
+An actual implementation may use macros instead of functions.
+\ac{hal} implementations are located in the \verb+hal-$APP/+
+subdirectories, more generic \ac{hal} code may be located in
+\verb+hal/+.
+If your platform requires additional code/libraries, these should be
+placed in the \verb+bsp/+ subdirectory.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: porting
+%%% TeX-PDF-mode: t
+%%% End: 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%<!-- Local IspellDict: english -->

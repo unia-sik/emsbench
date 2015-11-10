@@ -1,0 +1,47 @@
+$Id: directories.txt 366 2015-09-09 09:36:11Z klugeflo $
+
+|
++- data			Configuration files for cars and driving profiles
+|
++- doc			Documentation
+|
++- embedded		Code running on embedded processors
+|  |
+|  +- arch		Architecture-dependant code
+|  |  |
+|  |  +- default	Template for $ARCH (below)
+|  |  |  |
+|  |  |  +- bsp		Board Support Package
+|  |  |  |  |
+|  |  |  |  +- lib	"make -C $(ARCH)/bsp" should place all libraries here
+|  |  |  |
+|  |  |  +- conf	Build configuration file
+|  |  |  |
+|  |  |  +- hal		HAL for both applications (ems/tg)
+|  |  |  |
+|  |  |  +- hal-ems	HAL implementation for ems
+|  |  |  |
+|  |  |  +- hal-tg	HAL implementation for trace generator
+|  |  |  |
+|  |  |  +- include	Include files for HAL
+|  |  |     |
+|  |  |     +- ems
+|  |  |     |
+|  |  |     +- tg
+|  |  |
+|  |  +- $ARCH		Actual architecture dependant code
+|  |  ...
+|  +- build		Build path for embedded code (hal and [ems|tracegen])
+|  |  |
+|  |  +- $(ARCH)-$(APP)
+|  |  |  |
+|  |  .  +- hal
+|  |  .  +- hal-$(APP)
+|  |  .  +- $(APP)
+|  |
+|  +- ems		EMS implementation (architecture independant, uses HAL)
+|  |
+|  +- tg		Trace generator (architecture independant, uses HAL)
+|
++- tgpp			Trace Generator PreProcessor (running on HOST)
+

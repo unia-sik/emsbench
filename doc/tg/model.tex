@@ -1,0 +1,355 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% $Id: model.tex 333 2015-06-30 13:00:39Z klugeflo $
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Model}
+\label{s:model}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Model Assumptions}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{itemize}
+\item Ideal driver and engine: engine speed adapts exactly according
+  to driving cycle
+\item no car speed is lost while clutch is disengaged for gear change
+\item FreeEMS NipponDenso uses 24/2 sensor at cam shaft which has half
+  the speed of the crank shaft. Simplify model by assuming 12/1 sensor
+  mounted to crank shaft, amounts to same behaviour
+\item engine yields constant acceleration if accelerated/decelerated
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Rotary Sensor}
+\label{ss:model:rotary}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Figure~\ref{f:rs} depicts the behaviour of the rotary sensor.
+The automaton uses the current angular speed $\varphi(t)$ of the crank
+shaft as input.
+Any time a primary or secondary tooth passes a sensor, a
+corresponding signal $O_p$ or $O_S$ is emitted.
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[
+      initial text={},%\begin{minipage}{1.5cm}$\omega_0:=\omega_L$\\$\varphi_0:=\alpha$\\$\alpha:=0$\end{minipage}},
+      thick,node
+      distance=1.5cm]
+    \pgfsetcornersarced{\pgfpoint{1mm}{1mm}}
+    \tikzstyle{state without output}=  [draw,every state,align=center]
+    \node [state,initial] (running) {Running};
+
+    \path %[transition]
+    (running) edge [loop above] node [above] {$\varphi(t)\mbox{mod}\frac{1}{n_P}=0$/$O_P$} (running)
+    (running) edge [loop below] node [below] {$\varphi(t)\mbox{mod}\frac{1}{n_S}=0$/$O_S$}(running)
+    ;
+
+    \node [above=of running] {
+      \begin{tabular}{ll}
+        \textbf{Input:} & $\varphi(t)\in\mathbb{R}^+$\\
+        \textbf{Output:} & $O_P\in\{\mbox{absent},\mbox{present}\}$\\
+        & $O_S\in \{\mbox{absent},\mbox{present}\}$
+      \end{tabular}
+    };
+    
+  \end{tikzpicture}
+  \caption{Rotary Sensor}
+  \label{f:rs}
+\end{figure}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Crank Shaft}
+\label{ss:model:crank}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The behaviour of the crank shaft is depicted in figure~\ref{f:cs}.
+The model develops the angular position $\varphi(t)$ and the angular
+velocity $\omega(t)$.
+Speed changes are managed through the angular acceleration
+$\alpha$ which can be changed through the $\alpha_N$
+input.
+If a new $\alpha$ is set, the currently developed position and
+speed are saved as new initial values, and the current time is stored
+as new time offset.
+Setting of $\alpha$ must ensure that the angular velocity
+$\omega(t)$ never drops below $0$ (not contained in the model).
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[initial
+      text={\begin{minipage}{1.5cm}$\omega_0:=\omega_I$\\$\varphi_0:=\alpha$\\$\alpha:=0$\\$t_0=t$\end{minipage}},thick,node
+      distance=2.0cm]
+    \pgfsetcornersarced{\pgfpoint{1mm}{1mm}}
+    \tikzstyle{state without output}=  [draw,every state,align=center]
+    \node [state,initial] (running) {Running\\
+      $\varphi(t)=\frac{1}{2}\alpha(t-t_0)^2+\omega_0(t-t_0)+\varphi_0$\\
+      $\omega(t)=\alpha(t-t_0)+\omega_0$
+    };
+
+    \path %[transition]
+    (running) edge [loop above] node [above,align=center] {
+      $\alpha_N$/-\\
+      $\alpha:=\alpha_N, \omega_0:=\omega(t),
+      \varphi_0:=\varphi(t),t_0:=t$
+    } (running);
+
+    \node [above=of running] {
+      \begin{tabular}{ll}
+        \textbf{Input:} & $\alpha_N\in\mathbb{R}\cup\{\mbox{absent}\}$\\
+        \textbf{Output:} & $\omega(t)\in\mathbb{R}$\\
+        & $\varphi(t)\in\mathbb{R}^+$\\
+        \textbf{Variables:} & $\alpha\in\mathbb{R}$\\
+        & $\omega_0,\varphi_0,t_0\in\mathbb{R}^+$\\
+      \end{tabular}
+    };
+  \end{tikzpicture}
+  \caption{Crank shaft behaviour}
+  \label{f:cs}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Determination of $\alpha$}
+\label{ss:model:dotomega}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Only under certain circumstances, accelerations $a$ of the car from a
+driving cycle can be translated directly into angular accelerations of
+the crank shaft.
+There are a number of special situations, that also require some more
+work.
+Basically, we can describe the behaviour of the crank shaft as
+consisting of phases with constant angular acceleration.
+Each phase is a tuple $(\alpha,d)$ where $\alpha$ is the acceleration
+of this phase, and $d$ is its duration.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Regular Operation}
+
+A regular operation is on hand, if (1) the acceleration during an
+operation is constant, and (2) there is no gear change during the
+operation.
+These condition is fulfilled by the following operations of a driving
+cycle: \emph{idling}, \emph{steady speed}, \emph{deceleration}.
+Additionally, if an \emph{acceleration} operation has a start speed
+$\not=0$, it is also considered as a regular operation.
+
+\paragraph{Idling}
+\begin{equation}
+  \label{eq:alpha:idling}
+  \alpha = \alpha_I
+\end{equation}
+
+
+\paragraph{Steady Speed}
+\begin{equation}
+  \label{eq:alpha:steady}
+  \alpha = 0
+\end{equation}
+
+\paragraph{Acceleration and Deceleration}
+\begin{equation}
+  \label{eq:alpha:ac-deceleration}
+  \alpha = r_ag_i\frac{a}{c_w}\frac{1000\mbox{mm}}{\mbox{m}}
+\end{equation}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Driveaway from Standstill}
+\label{sss:model:driveaway}
+
+Actual behaviour: Driver slowly releases clutch, may press
+accelerator pedal.
+
+Modeling: Simplify! Assume engine speed is constant (idle speed) until
+clutch closed, then increases according to acceleration. Use
+acceleration to calculate time until clutch closed (where engine idle speed
+matches car speed).
+
+relationship car speed $\leftrightarrow$ engine speed:
+\begin{equation}
+  \omega(t) = r_ag_i\frac{v(t)}{\frac{c_w}{1000}\frac{\mbox{m}}{\mbox{mm}}}
+\end{equation}
+with
+\begin{equation}
+  v(t) = at + v_0
+\end{equation}
+
+Now we need to find the time $t_I$ with $\omega(t_I) = \omega_I$.
+
+Thus solve for $t$:
+\begin{equation}
+  r_ag_i\frac{at_I + v_0}{\frac{c_w}{1000}\frac{m}{mm}} = \omega_I
+\end{equation}
+with $v_0=0$ due to standstill, we get:
+\begin{equation}
+  \label{eq:driveaway:time}
+  t_I = \frac{\omega_I}{r_ag_ia}\frac{c_w}{1000}\frac{m}{mm}
+\end{equation}
+
+Thus, we have a first phase of duration $t_I$ according to
+eq.~\ref{eq:driveaway:time} where $\alpha=0$ and $\omega(t)=\omega_I$.
+In in the second phase, $\alpha$ is calculated according to
+eq.~\ref{eq:alpha:ac-deceleration}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Gear Change}
+\label{sss:model:gearchange}
+
+Actual behaviour: driver presses clutch and releases accelarator pedal,
+changes gear, releases clutch and presses accelerator.
+
+Modeling: Split gear change operation in two phases with equal
+duration.
+Let $d_g$ be the total duration of the gear change operation.
+Then each phase has a duration of $\frac{d_g}{2}$.
+\begin{enumerate}
+\item \textbf{Disengagement of clutch:}
+  Assume that clutch and accelerator pedal are disengaged instantly at
+  the beginning of this phase.
+  Then, $\omega$ changes with $\alpha_I$ until $\omega_I$ reached or
+  end of phase is reached.
+  Depending on the initial angular velocity $\omega_0$, the angular acceleration
+  must be chosen as:
+  \begin{equation}
+    \label{eq:alpha:gear:diseng}
+    \alpha_g = \left\{
+      \begin{array}{c@{\;:\;}l}
+        -\alpha_I&\omega_0>\omega_I\\
+        0 & \omega_0=\omega_I\\
+        \alpha_I&\omega_0<\omega_I
+      \end{array}
+      \right.
+  \end{equation}
+  Angular velocity develops as:
+  \begin{equation}
+    \label{eq:omega}
+    \omega(t) = \omega_0 + \alpha_g t
+  \end{equation}
+  Assume that phase starts at $t=0$. Distinguish \underline{two} cases:
+  \begin{enumerate}
+  \item If there exists a $t_I<\frac{d_g}{2}$ such that $\omega(t_I)=\omega_I$,
+    introduce two phases $(\alpha_g,t_I)$, $(0,\frac{d_g}{2}-t_I)$.
+  \item If no such $t_I$ exists, introduce \underline{one} phase $(\alpha,\frac{d_g}{2})$.
+  \end{enumerate}
+\item \textbf{Engagement of clutch with new gear:}
+  Assume that the gear is changed at the beginning of this phase, and
+  the clutch is finally closed exactly at the end of this phase.
+  The aim is to develop $\omega(t)$ in such a manner that
+  $\omega(d_g)$ matches the new rotation speed at the end of the
+  phase.
+  To simplify calculations, we renormalise the time base to $t=0$ at
+  the beginning of the phase, and let $\omega_0$ be the angular
+  velocity at the end of the previous phase.
+  Let $v$ be the current speed of the car ($v_e$ of previous and $v_s$
+  of next phase).
+  Then, the target angular speed $\omega(\frac{d_g}{2})$ is
+  \begin{equation}
+    \omega(\frac{d_g}{2}) =
+    r_ag_i\frac{v}{\frac{c_w}{1000}\frac{\mbox{m}}{\mbox{mm}}}
+  \end{equation}
+  Then, $\alpha_G$ is calculated as
+  \begin{equation}
+    \label{eq:omega:gear}
+    \alpha_G = \frac{2}{d_g}\left(\omega(\frac{d_g}{2}) -
+    \omega_0\right)
+    =
+    \frac{2}{d_g}\left(r_ag_i\frac{v}{\frac{c_w}{1000}\frac{\mbox{m}}{\mbox{mm}}}
+    -\omega_0\right)
+  \end{equation}
+
+  %% gear change at beginning, $\omega$ must change such that it
+  %% matches new (rotation) speed when clutch closed at end of phase.
+  %% Need to find $\alpha_G$ such that
+  %% \begin{equation}
+  %%   \omega(t) = \omega_0 + \alpha_Gt
+  %% \end{equation}
+  %% with
+  %% \begin{equation}
+  %%   \omega(t) = \frac{v(t)}{\frac{d_w}{1000}\frac{m}{mm}}
+  %% \end{equation}
+  %% with $t$ end of phase. Solving for $\alpha_G$:
+  %% \begin{equation}
+  %%   \label{eq:omega:gear}
+  %%   \alpha_G = \frac{1}{t}\left(\frac{v(t)}{\frac{d_w}{1000}\frac{m}{mm}} - \omega_0\right)
+  %% \end{equation}
+\end{enumerate}
+
+Further assume that no speed is lost while clutch is disengaged.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Deceleration with Clutch Disengaged}
+\label{sss:model:clutchdisen}
+
+When the car is decelerated with the clutch being disengaged, the
+engine speed should approximate $\omega_I$.
+Let $d_d$ be the total duration of this operation.
+We model this operation with two phases:
+\begin{enumerate}
+\item\textbf{Approximation:}
+  If $\omega(t)=\omega_I$, this phase is skipped.
+  Else, the engine speed has to drop or rise to $\omega_I$.
+  Therefore, $\alpha_d$ is chosen according to
+  eq.~\ref{eq:alpha:gear:diseng}.
+  Again, assume that this phase starts at $t=0$.
+  Then, the phase ends at $t_a$ with:
+  \begin{equation}
+    \omega(t_a) = \omega_I
+  \end{equation}
+  Combine with eq.~\ref{eq:omega} and solve for $t_a$ and add phase
+  $(\alpha_d,\min(t_a,d_d))$.
+  
+\item\textbf{Idling:}
+  If $t_a\geq d_d$, this phase is skipped.
+  Else, the engine speed stays constant.
+  We add a phase $(0, d_d-t_a)$.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: tg
+%%% TeX-PDF-mode: t
+%%% End: 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%<!-- Local IspellDict: english -->

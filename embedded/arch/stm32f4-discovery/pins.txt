@@ -1,0 +1,16 @@
+$Id: pins.txt 386 2015-10-01 15:18:34Z meixnean $
+
+red: Primyry RPM Signal
+black: Secondary RPM Signal
+       TG   EMS
+
+red    PB6  PA1
+black  PB7  PB8
+
+EMS pins had to be "distributed". If they are too close, crosstalk
+happens and a primary signal is also detected when the secondary
+signal is switched back to LOW.
+
+
+Ignition output signals
+GPIOC pins 1 to 6 (PC1, PC2, PC3, PC4, PC5, PC6)

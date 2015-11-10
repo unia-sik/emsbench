@@ -1,0 +1,8 @@
+$Id: running.txt 366 2015-09-09 09:36:11Z klugeflo $
+
+Build and upload the code to the boards using the build-*.py scripts.
+After reset, the program will NOT automatically start running.
+You need to connect to the respective boards with a serial terminal,
+enter an arbitrary char and press the enter key.
+In the serial terminal, you can trace the log and debug outputs of
+program execution.

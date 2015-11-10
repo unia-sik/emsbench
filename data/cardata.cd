@@ -1,0 +1,51 @@
+# $Id: cardata.cd 333 2015-06-30 13:00:39Z klugeflo $
+# This file contains car specific data
+# Comments begin with a '#' symbol, they must stand on a separate line
+# All entries must have the form "key = value"
+# Do not enter other text, this will break parsing!
+
+# Tyre
+# 195 / 70 R 14 86 H
+#  a     b c d  e  f
+# a = width
+# b = aspect ratio
+# d = diameter
+
+width = 175
+aspect_ratio = 65
+diameter = 15
+
+
+# Engine and car
+# example data from: toyota website
+# 1.0-lVVT-i51kW(69PS); 5 Gears
+
+# Idle rpm
+idle_rpm = 700
+
+# Acceleration to idle s^{-2}
+acc_to_idle = 20
+
+# Gear translation
+# If no 6th gear is available, enter 0
+
+# Example data from: toyota website
+# 1.0-lVVT-i51kW(69PS); 5-Gear manual transmission
+
+gear[1] = 3.545
+gear[2] = 1.913
+gear[3] = 1.31
+gear[4] = 1.027
+gear[5] = 0.85
+gear[6] = 0
+
+# Axle and cardan translation. If not available, set to 1
+axle = 4.294
+
+# Number of primary teeth
+primary_teeth = 12
+
+# the number of secondary teeth is fixed to 1!
+
+# offset of secondary tooth
+offset_secondary = 0.04

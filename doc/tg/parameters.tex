@@ -1,0 +1,207 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% $Id: parameters.tex 333 2015-06-30 13:00:39Z klugeflo $
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Parameters}
+\label{s:parameters}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+All parameters and associated units are depicted in
+table~\ref{t:parameters}.
+Please note that we use rounds (revolution of the crank shaft) as unit
+for angular parameters to simplifie calculations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Car Parameters}
+\label{ss:parameters:car}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% # 195 / 70 R 14 86 H
+%% #  a     b c d  e  f
+%% a 175
+%% b 65
+%% d 15
+
+%% # a = width
+%% # b = aspect ratio
+%% # d = diameter
+
+\begin{table}
+  \caption{Tyre labelling}
+  \label{t:tyre}
+  \centering
+  \begin{tabular}{c@{/}ccccc}
+    195 & 70 & R & 14 & 86 & H\\\hline
+    $w$ & $r_t$ & - & $d_r$ & - & -
+  \end{tabular}
+\end{table}
+
+\begin{itemize}
+\item Tyres with (see also tab.~\ref{t:tyre}):
+  \begin{itemize}
+  \item Width $w$ [mm]
+  \item Aspect ratio $r_t$ [\%]
+  \item Rim diameter $d_r$ ["]
+  \end{itemize}
+\item Transmission ratio of cardan shaft and/or axle $r_a$
+\item Transmission ratios of gears $\{G_1\ldots G_5\}$
+\item idle speed of engine $U_I [\mbox{min}^{-1}]$
+\item derived idle speed of engine:
+  \begin{equation}
+    \label{eq:omega:idle}
+    \omega_I=\frac{U_I}{60}\frac{\mbox{min}}{\mbox{s}}
+  \end{equation}
+
+\end{itemize}
+
+Calculation of tyre circumference:
+\begin{itemize}
+\item Flank height $h_f [\mbox{mm}]$ of tyre:
+  \begin{equation}
+    \label{eq:flank}
+    h_f = w\frac{r}{100}
+  \end{equation}
+\item Wheel diameter $d_w [\mbox{mm}]$:
+  \begin{equation}
+    \label{eq:wdiam}
+    d_w = 2.54\frac{\mbox{mm}}{\mbox{in}}d_r + 2h_f
+  \end{equation}
+\item Tyre circumference $C$:
+  \begin{equation}
+    \label{eq:tcirc}
+    c_w = \pi d_w
+  \end{equation}
+\end{itemize}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Driving Cycle}
+\label{ss:parameters:cycle}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+phase:
+\begin{itemize}
+\item acceleration $a [\frac{m}{s^2}]$
+\item speed $v_s, v_e [\frac{km}{h}]$
+\item duration $d [s]$
+\item gear $g [0\ldots 5]$; gear $0$ stands for any time the engine is
+  idle, i.e. when the clutch is pressed and thus disconnects the wheels from the engine.
+\end{itemize}
+
+Basic calculations:
+\begin{itemize}
+\item acceleration $\dot{\omega}_w$ of wheel (if $a\not=0$):
+  \begin{equation}
+    \dot{\omega}_w =
+    \frac{a}{\frac{d_w}{1000}\frac{\mbox{m}}{\mbox{mm}}}
+  \end{equation}
+\item acceleration $\dot{\omega}_c$ of crank shaft (if $a\not=0$):
+  \begin{equation}
+    \dot{\omega}_c = \dot{\omega}_w G_g r_a
+  \end{equation}
+\end{itemize}
+
+A simple example for a driving cycle is shown in table~\ref{t:cycle:example}.
+Further examples can be found in appendix~\ref{s:dc}.
+
+\begin{table}[htbp]
+  \caption{Example for driving cycle (excerpt from urban cycle,
+    operations 6-13)}
+  \label{t:cycle:example}
+  \begin{tabular}{c|l|c|c|c|c}
+    Op. Nr. & Operation & Acc. & Speed & Dur. & Gear\\\hline
+    1 & Idling & - & - & 21 & 16 s PM + 5 s K1\\
+    2 & Acceleration & 0,83 & 0-15 & 5 & 1\\
+    3 & Gear change & - & - & 2 & 1\textrightarrow2\\
+    4 & Acceleration & 0,94 & 15-32 & 5 & 2\\
+    5 & Steady speed & - & 32 & 24 & 2\\
+    6 & Deceleration & -0,75 & 32-10 & 8 & 2\\
+    7 & Dec., clutch diseng. & -0,92 & 10-0 & 3 & K2\\
+    8 & Idling & - & - & 21 & 16 s PM + 5 s K1\\
+  \end{tabular}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{table}[htbp]
+  \caption{Parameters used in trace generation}
+  \label{t:parameters}
+  \def\subt#1{\hline
+    \multicolumn{4}{l}{\textbf{#1}}\\\hline
+  }
+  \begin{tabularx}{\textwidth}{l@{$\;:\ \;$}cc@{\quad}X}
+    \multicolumn{1}{l}{\textbf{Symbol}} & \multicolumn{1}{l}{\textbf{Domain}} & \textbf{Unit} & \textbf{Description}\\
+    \subt{Car}
+    $w$ & $\mathbb{R}^+$ & mm & Tyre width\\\hline
+    $r_t$ & $[1\ldots100]$ & \% & Aspect ratio flank/width\\\hline
+    $d_r$ & $\mathbb{R}^+$ & in & Rim diameter\\\hline
+    $r_a$ & $\mathbb{R}^+$ & - & Transmission ratio of cardan shaft
+    and/or axle (input/output)\\\hline
+    $g_{1\ldots5}$ & $\mathbb{R}^+$ & - & Transmission ratio of gears 1 to
+    5 (input/output)\\\hline
+    $U_I$ & $\mathbb{R}^+$ & $\mbox{min}^{-1}$ & Idle speed of
+    engine\\\hline
+    $\alpha_I$ & $\mathbb{R}^+$ & $\mbox{s}^{-2}$ & Absolute value of
+    angular acceleration to reach idle speed when engine idle\\\hline
+    \hline
+    $\omega_I$ & $\mathbb{R}^+$ & $\mbox{s}^{-1}$ & Idle speed of
+    engine (eq.~\eqref{eq:omega:idle})\\\hline
+    $h_f$ & $\mathbb{R}^+$ & mm & Flank height of tyre (eq.~\eqref{eq:flank})\\\hline
+    $d_w$ & $\mathbb{R}^+$ & mm & Wheel diameter (eq.~\eqref{eq:wdiam})\\\hline
+    $c_w$ & $\mathbb{R}^+$ & mm & Tyre circumference (eq.~\eqref{eq:tcirc})\\\hline
+    \subt{Rotary Sensor}
+    $n_P$ & $\mathbb{N}$ & - & Number of primary teeth on rotary
+    sensor\\\hline
+    $n_S$ & $\mathbb{N}$ & - & Number of secondary teeth on rotary sensor\\\hline
+    $O_P$ & $\{\mbox{abs},\mbox{pres}\}$ & - & Primary signal\\\hline
+    $O_S$ & $\{\mbox{abs},\mbox{pres}\}$ & - & Secondary
+    signal\\\hline
+    $\Delta_P$ & $\mathbb{R}^+$ & (rounds) & Angular distance between
+    two adjacent primary teeth\\\hline
+    $\Delta_S$ & $\mathbb{R}^+$ & (rounds) & Angular distance between
+    two adjacent secondary teeth\\\hline
+    $\phi_S$ & $[3\Delta_P,4\Delta_P)$ & (rounds) & Angular distance
+      between first primary and first secondary tooth; see \ref{p:trace:sectooth} for details\\\hline
+    \subt{Driving Cycle}
+    $a$ & $\mathbb{R}$ & $\mbox{m}\mbox{s}^{-2}$ &
+    Acceleration\\\hline
+    $v_s$ & $\mathbb{R}^+$ & $\mbox{km}\mbox{h}^{-1}$ & Car speed at
+    start of operation\\\hline
+    $v_e$ & $\mathbb{R}^+$ & $\mbox{km}\mbox{h}^{-1}$ & Car speed at
+    end of operation\\\hline
+    $d$ & $\mathbb{R}^+$ & s & Duration of operation\\\hline
+    $g$ & $[0\ldots5]$ & - & Gear used in operation (0 = clutch disengaged)\\\hline
+    \hline
+    $\alpha_w$ & $\mathbb{R}$ & $\mbox{s}^{-2}$ & Angular acceleration
+    of wheel\\\hline
+    \subt{Crank Shaft Motion}
+    $\varphi(t)$ & $\mathbb{R}^+_0$ & (rounds) & Angular position of crank
+    shaft\\\hline
+    $\omega(t)$ & $\mathbb{R}^+$ & $\mbox{s}^{-1}$ & Angular velocity
+    of crank shaft\\\hline
+    $\alpha$ & $\mathbb{R}$ & $\mbox{s}^{-2}$ & Angular acceleration
+    of crank shaft\\\hline
+  \end{tabularx}
+\end{table}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: tg
+%%% TeX-PDF-mode: t
+%%% End: 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%<!-- Local IspellDict: english -->

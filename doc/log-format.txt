@@ -1,0 +1,90 @@
+$Id: log-format.txt 458 2015-10-23 13:02:00Z meixnean $
+
+Trace Generator:
+================
+- ON times of primary/secondary signal (OFF times are omitted for
+performance)
+- Information about renormalisation after each full crank shaft
+revolution
+- Information about phase changes
+
+
+EMS:
+====
+
+PrimaryRPMISR:
+--------------
+p[num]: when the signal was detected
+
+EP s1: missing sync
+
+EP s2: lost sync
+
+P2: this is a "second pulse" where injection/ignition must be set for
+one channel
+
+PP: really set injection/ignition
+
+E: invalid channels [num] [num]: error in calculation
+
+P@[A]: Na[B]@[C]: schedule injection for channel [B] for time [C], ISR
+was triggered by signal at time [A] (should be the same as in p[num]),
+*a*ctivate ECT channel
+
+P@[A]: Nq[B]@[C]: same as above, but channel was already active
+
+P@[A]: IDa[B]@[C]: schedule ignitionDwell for channel [B] with offset
+[C] from now ([A]), ISR was triggered by signal at time [A] (should be
+the same as in p[num]), *a*ctivate PIT channel
+
+P@[A]: IDd[B]@[C]: same as above, but channel was already active
+
+P@[A]: IDq[B]@[C]: same as above, but queue event as another must be
+performed before
+
+P@[A]: IFa[B]@[C]: schedule ignitionFire for channel [B] with offset
+[C] from now ([A]), ISR was triggered by signal at time [A] (should be
+the same as in p[num]), *a*ctivate PIT channel
+
+P@[A]: IFd[B]@[C]: same as above, but channel was already active
+
+P@[A]: IFq[B]@[C]: same as above, but queue event as another must be
+performed before
+
+P1: this was the first pulse, doe nothing
+
+P@->0: this was the LOW edge of signal, do nothing
+
+SecondaryRPMISR:
+--------------
+
+
+InjectorXISR:
+-------------
+
+Nh[A]@[B]: Nl@[C]: injector channel [A] to HIGH at time [B], set IRQ
+for time [C] to pull to LOW
+
+Nl[A]@[B]: injector channel [A] pulled to LOW at time [B]
+
+Nlur@[A]: set HIGH time for another injection at time [A]
+
+
+IgnitionDwellISR:
+-----------------
+ID[A]@[B] [C]: dwelling of ignition coil for channel [A] after counter
+[B] elapsed, ISR started at time [C]
+
+IDr[A]@[B]: set a queued dwell event for channel [A] with time offset
+[B]
+
+
+
+IgnitionFireISR:
+----------------
+IF[A]@[B] [C]: ignition fired for channel [A] after counter [B]
+elapsed, ISR started at time [C]
+
+IFr[A]@[B]: set a queued dwell event for channel [A] with time offset
+[B]
+

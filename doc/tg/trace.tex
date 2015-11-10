@@ -1,0 +1,249 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% $Id: trace.tex 333 2015-06-30 13:00:39Z klugeflo $
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Trace Generation}
+\label{s:tracegen}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Preliminary Considerations}
+\label{ss:tracegen:prelim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Actual generation of traces on embedded platform should be as simple
+as possible.
+If enough memory is available, it would be possible to calculate all
+signal times offline, such that the actual generator program simply runs
+through a table.
+Due to the vast memory requirements of such an approach, we utilise a
+hybrid approach instead.
+At least parts of the necessary calculations are performed offline.
+Our aim is to implement trace generation through a composition of the
+automatons described in sections~\ref{ss:model:rotary} and
+\ref{ss:model:crank}.
+Input data for these models is provided in pairs
+$(t_N,\alpha_N)$, where $t_N$ is the time when the angular
+acceleration changes to $\alpha_N$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Preprocessor}
+\label{ss:tracegen:preproc}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The preprocessor transforms a driving cycle table (for examples, see
+appendix~\ref{s:dc}) into an angular acceleration table for the actual
+trace generator.
+Thereby, the preprocessor proceeds as described in
+section~\ref{ss:model:dotomega}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Generator}
+\label{ss:tracegen:generator}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Tasks:
+\begin{itemize}
+\item set angular acceleration $\alpha$
+\item develop $\varphi(t)$ and $\omega(t)$
+\item generate signals $O_P, O_S$
+\end{itemize}
+
+Approach: Perform all relevant work in ISR for primary teeth.
+Simplify implementation by setting a new $\alpha$ only when $O_P$
+occurs.
+$O_S$ timer is set in a corresponding (find an apt one) $O_P$
+instance.
+In the following, we use the expression \emph{phase} to denote the
+time span between two changes of $\alpha$.
+During a phase, $\alpha$ is constant.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Primary Teeth}
+
+\begin{table}
+  \caption{Parameters for primary teeth calculations}
+  \label{t:parameters:primary}
+  \vspace{1ex}
+  \centering
+  \begin{tabularx}{\textwidth}{c@{$\;:\ \;$}l@{\quad}X}
+    \hline\hline
+    $\Delta_P$ & $\mathbb{R}^+$ & Angular distance between two teeth\\
+    $\varphi(t)$ & $\mathbb{R}^+_0$ & Angular position of crank shaft\\
+    $\varphi^P_0$ & $\mathbb{R}^+_0$ & Initial position offset of
+    crank shaft at beginning of current phase\\
+    $\omega(t)$ & $\mathbb{R}^+_0$ & Angular velocity of crank shaft\\
+    $\omega_0$ & $\mathbb{R}^+_0$ & Initial angular velocity of crank
+    shaft at beginning of current phase\\
+    $\alpha$ & $\mathbb{R} $ & Angular acceleration of crank
+    shaft\\
+    $t_0$ & $\mathbb{R}^+_0$ & Time offset of current phase\\
+    \hline\hline
+  \end{tabularx}
+\end{table}
+
+The parameters used in the following calculations are explained in
+table~\ref{t:parameters:primary}.
+The occurence of a primary tooth is characterised by the following
+equation:
+\begin{eqnarray}
+  \varphi(t) - \varphi^P_0 \equiv 0 & (\mbox{mod } \Delta_P)
+\end{eqnarray}
+Through constraining a change of $\alpha$ to times where $O_P$
+occurs, we can simplify this equation and search for the $k_P$-th
+primary signal in a phase that is characterised by:
+\begin{equation}
+  \label{eq:trace:p:kth}
+  \varphi(t) = \varphi^P_0 + k_P\Delta_P
+\end{equation}
+
+Solve equation~\eqref{eq:trace:p:kth}:
+\begin{eqnarray}
+  & \frac{1}{2}\alpha(t-t_0)^2+\omega_0(t-t_0)+\varphi^P_0 =
+  \varphi^P_0 + k\Delta_P&\\
+  \Leftrightarrow & \frac{1}{2}\alpha t^2 + \omega_0t -
+  \frac{1}{2}\alpha t_0^2-\omega_0t_0 - k\Delta_P=0 &\\
+  \Leftrightarrow & t_{1/2} = \frac{-\omega_0\pm\sqrt{\omega_0^2 +
+      2\alpha\left(\frac{1}{2}\alpha t_0^2+\omega_0t_0 + k\Delta_P\right)}}{\alpha}&
+\end{eqnarray}
+
+We are only interested in the right-hand solution, as $t(k)$ must be a
+monotonically increasing function:
+\begin{equation}
+  t(k) = \frac{-\omega_0 + \sqrt{\omega_0^2 +
+      2\alpha\left(\frac{1}{2}\alpha t_0^2 +
+      \omega_0t_0\right) + 2\alpha k\Delta_P}}{\alpha}
+\end{equation}
+Parts of the discriminant must only be calculated when a new
+phase begins.
+Defining two constants
+\begin{eqnarray}
+  D_1 & := & \omega_0^2 +
+  2\alpha\left(\frac{1}{2}\alpha t_0^2 +
+  \omega_0t_0\right)\\
+  D_2 & := & 2\alpha\Delta_P
+\end{eqnarray}
+we can simplify $t(k)$:
+\begin{equation}
+  \label{eq:tk}
+    t(k) = \frac{-\omega_0 + \sqrt{D_1 + D_2k}}{\alpha}
+\end{equation}
+
+The above calculations apply mainly to the primary signal $O_P$.
+To generate $O_P$ concurrently, a closer look is necessary.
+The basic approach is to perform all calculations only in the IRQ
+handler of the $O_P$ routine.
+Concerning $O_S$, a phase shift parameter
+$\phi_S\in[0,\Delta_P)$ is introduced that describes the
+angular distance betweeen the secondary tooth and the preceding
+primary tooth.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Secondary Teeth}
+
+\begin{table}
+  \caption{Additional parameters for secondary teeth calculations}
+  \label{t:parameters:secondary}
+  \vspace{1ex}
+  \centering
+  \begin{tabularx}{\textwidth}{c@{$\;:\ \;$}l@{\quad}X}
+    \hline\hline
+    $\varphi^S_0$ & $\mathbb{R}^+_0$ & Initial position offset of next tooth\\
+    $\Delta_S$ & $\mathbb{R}^+$ & Angular distance between two secondary teeth\\
+    $\phi_S$ & $\mathbb{R}^+_0$ & Angular distance between next
+    secondary tooth and primary tooth at which last phase change was triggered\\
+    \hline\hline
+  \end{tabularx}
+\end{table}
+
+Calculations of the secondary teeth times require additional
+parameters that are summarised in table~\ref{t:parameters:secondary}.
+Times for $O_S$ can be developed in a similar manner, but the
+calculations will be a bit more complex, as a change of $\alpha$
+will not necessarily overlap with an occurrence of $O_S$.
+Thus, $O_S$ will occur any time when:
+\begin{eqnarray}
+  \varphi(t) - \varphi^S_0 \equiv 0 & (\mbox{mod } \Delta_S)
+\end{eqnarray}
+Ideally, the time of $O_S$ should just be calculated when the preceeding
+primary tooth was triggered, to account for a possible change of
+$\alpha$.
+
+The $k$-th secondary signal in a single phase has the following
+property:
+\begin{equation}
+  \label{eq:trace:s:kth}
+  \varphi(t) = \varphi_0 + \phi_S + (k-1)\Delta_S
+\end{equation}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Implementation Notes}
+
+\paragraph{Time Units}
+Use seconds.
+
+\paragraph{Replace Multiplication by Addition}
+Implementation should use equations~\eqref{eq:trace:p:kth} and
+\eqref{eq:trace:s:kth}:
+The $k$ parameter will only implicitly be kept, instead implementation
+should simply advance the $k\Delta_P$ resp. $(k-1)\Delta_S$ products.
+
+\paragraph{Keep Numbers small}
+In the long rung, the angular position $\varphi(t)$ can grow to a very
+large number.
+Reset $\varphi(t)$ in regular intervals, e.g once per revolution, to
+avoid loosing precision.
+
+\paragraph{Irrelevance of Phase Shift}
+For the use case, the initial phasing of the crank shaft is
+irrelevant.
+Therefore, set $\varphi_0:=0$.
+
+\paragraph{Renormalisation}
+Renormalisation is performed at $\varphi(t)=0\;(\mbox{mod }1)$.
+\begin{eqnarray}
+  \omega_0 & := & \omega(t)\\
+  \varphi_0 & := & 0\\
+  t_0 & := & t\\
+  \leftrightarrow t & := & 0\\
+\end{eqnarray}
+
+\paragraph{Secondary Tooth}
+\label{p:trace:sectooth}
+Let the secondary tooth reside directly after the third primary tooth
+at $\phi_S\in\left[3\Delta_P,4\Delta_P\right)$.
+
+\paragraph{Phase Change}
+May happen at any primary tooth.
+Some phases are very short (1-2 teeth).
+Restricting phase changes to only a single tooth would make the
+discriminant in calculation of next $t$ (eq.~\eqref{eq:tk}) negative.
+ Additional work:
+\begin{equation}
+  \alpha := \alpha_N
+\end{equation}
+
+\paragraph{Setting Secondary Tooth Timer}
+Performed in ISR for second primary tooth.
+Depending on the actual $\phi_S$, even the third ISR might suffice,
+but we want to be on the safe side.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: tg
+%%% TeX-PDF-mode: t
+%%% End: 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%<!-- Local IspellDict: english -->

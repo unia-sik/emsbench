@@ -1,0 +1,162 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% $Id: implementation.tex 395 2015-10-02 14:22:13Z klugeflo $
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Implementation}
+\label{s:implementation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Preprocessor}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+Algorithm~\ref{a:preprocessor} shows the basic structure/functionality
+of the preprocessor tool.
+The following special cases are handled:
+\begin{description}
+  \item[driveaway] is detected if the \emph{startspeed} of an
+    operation is 0 and the \emph{endspeed} is $\not=0$.
+  \item[standstill] \emph{start-} and \emph{endspeed} of the operation
+    are 0
+  \item[clutch disengaged] is found if the currend speed is $\not=0$
+    and gear is 0.
+  \item[gearchange] if the gear of the current phase is different from
+    the one of the previous phase.
+\end{description}
+
+
+
+\begin{algorithm}
+  \caption{Preprocessing of driving cycle}
+  \label{a:preprocessor}
+  \begin{algorithmic}
+    \Require OperationList contains all operation of the driving
+    cycle, each operation is a tuple (acceleration, startspeed,
+    endspeed, duration, gear)
+    \Ensure PhaseList contains the corresponding phases for the generator
+    \Procedure{Preprocess}{OperationList}
+    %\State \textbf{declare} PhaseList
+    \ForAll{op in OperationList}
+    \If{driveaway}
+    \Comment{Phases according to sect.~\ref{sss:model:driveaway}}
+    \State PhaseList.enqueue(0, $t$) \Comment{$t$ according to eq.~\eqref{eq:driveaway:time}}
+    \State PhaseList.enqueue($\alpha_N$, op.duration$-t$)
+    \ElsIf{standstill}
+    \State PhaseList.enqueue($\pm\alpha_I$, $t$) \Comment{$t$
+      until $\omega_I$ reached}
+    \State PhaseList.enqueue(0, op.duration$-t$)
+    \ElsIf{clutch disengaged}
+    \Comment{Phases according to sect.~\ref{sss:model:clutchdisen}}
+    \State PhaseList.enqueue($\pm\alpha_I$, $t$) \Comment{until
+      $\omega_I$ reached}
+    \State PhaseList.enqueue(0, op.duration$-t$)
+    \ElsIf{gearchange}
+    \Comment{Phases according to sect.~\ref{sss:model:gearchange}}
+    \State PhaseList.enqueue($\pm\alpha_I$, $\frac{1}{2}$op.duration)
+    \State PhaseList.enqueue($\alpha_G$,  $\frac{1}{2}$op.duration)
+    \Comment{$\alpha_G$ from eq.~\eqref{eq:omega:gear}}
+    \Else\Comment{regular driving/acceleration/deceleration}
+    \State PhaseList.enqueue(angular acceleration, op.duration)
+    \EndIf
+    \EndFor
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Generator}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The generator has to implement two interrupt service routines, one for
+the primary tooth (alg.~\ref{a:isr:primary}) and one for the secondary
+tooth (alg.~\ref{a:isr:secondary}).
+Most of the work is performed in the primary ISR when the signal is
+deactivated.
+
+\begin{algorithm}
+  \caption{ISR for primary tooth}
+  \label{a:isr:primary}
+  \begin{algorithmic}
+    \Procedure{PrimaryISR}{}
+    \If{pin activate}
+    \State set deactivation time
+    \State \Return
+    \Else
+    \If{$k==0$}\Comment{Renormalise}
+    \State $\omega_0\gets\omega(t)$
+    \State $\varphi_0\gets 0$
+    \State $t\gets 0$
+    \EndIf
+    \If{phase change pending}\Comment{Change Phase}
+    \State $\alpha\gets\alpha_N$
+    \EndIf
+    \State calculate next $t_P$
+    \State set primary activation time
+    \If{$k==1$}\Comment{set secondary timer}
+    \State calculate next $t_S$
+    \State set secondary activation time
+    \EndIf
+    \EndIf
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+  \caption{ISR for secondary tooth}
+  \label{a:isr:secondary}
+  \begin{algorithmic}
+    \Procedure{SecondaryISR}{}
+    \If{pin activate}
+    \State set deactivation time
+    \State \Return
+    \Else
+    \Comment{do nothing}
+    \EndIf
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+
+The following constants are additionally necessary:
+\begin{description}
+\item[TimeToTicks] convert time values from solution of equations to
+  timer ticks
+\end{description}
+
+
+Notes on implementation experience:
+\begin{itemize}
+\item Times for primary OC must be set relatively to previous primary
+\item Times for secondary OC should be set absolutely.
+  Using relative numbers would increase complexity.
+  Absolute number should be derived from previous primary time
+  (trigger of calculation).
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: tg
+%%% TeX-PDF-mode: t
+%%% End: 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%<!-- Local IspellDict: english -->

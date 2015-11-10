@@ -1,0 +1,15 @@
+# $Id: codingstyle 471 2015-10-26 12:55:14Z klugeflo $
+# Config file for astyle
+
+# doc: http://astyle.sourceforge.net/astyle.html
+
+# Java brackets (opening at end of line, closing on separate line)
+--style=java
+# 2 spaces indent (as in emacs)
+--indent=spaces=2
+
+--break-closing-brackets
+--break-elseifs
+
+# Always use brackets
+--add-brackets

@@ -1,0 +1,8 @@
+# $Id: 10.ndc 366 2015-09-09 09:36:11Z klugeflo $
+# 10 seconds idling
+# CAUTION: Comments must stand on separate lines, do not append them to data!
+# Acc. ; SpeedS ; SpeedE ; Dur. ; Gear
+
+
+      ; 0  ;  0 ; 11 ; 0
+
