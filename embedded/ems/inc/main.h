@@ -55,6 +55,13 @@
 //unsigned short lastCalcCount;
 int main_freeems(void);
 
+/*
+ * @author Andreas Meixner
+ * @brief The original main function of FreeEMS
+ * This function is now called by main() (see main.c)
+ */
+int main_freeems(void);
+
 #else
 /* let us know if we are being untidy with headers */
 #warning "Header file MAIN_H seen before, sort it out!"

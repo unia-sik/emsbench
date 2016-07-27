@@ -17,7 +17,7 @@
  * along with EmsBench.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * $Id: hal_performance.h 502 2015-11-05 14:18:19Z klugeflo $
+ * $Id: hal_performance.h 546 2016-07-15 06:51:19Z klugeflo $
  * @ingroup halInterface
  * @brief Funktions for performance logging.
  * @file hal_performance.h
@@ -26,6 +26,7 @@
  */
 #ifndef HAL_PERFORMANCE_H_
 #define HAL_PERFORMANCE_H_
+
 
 /**
  * @author Andreas Meixner
@@ -45,4 +46,6 @@ extern void hal_performance_startCounter();
  */
 extern unsigned int hal_performance_stopCounter();
 
-#endif /* HAL_PERFORMANCE_H_ */
+
+
+#endif /* !HAL_PERFORMANCE_H_ */

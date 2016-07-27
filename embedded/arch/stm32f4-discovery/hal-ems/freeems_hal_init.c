@@ -17,7 +17,7 @@
  * along with EmsBench.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * $Id: freeems_hal_init.c 502 2015-11-05 14:18:19Z klugeflo $
+ * $Id: freeems_hal_init.c 561 2016-07-24 15:24:52Z meixnean $
  * @brief Implementation of initialization functions.
  * @file freeems_hal_init.c
  * @author Andreas Meixner, Claudius Heine,
@@ -30,6 +30,11 @@
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/cm3/nvic.h>
 #include <libopencmsis/core_cm3.h>
+
+// For system info
+#include <hal/log.h>
+#include <libopencm3/stm32/flash.h>
+#include <libopencm3/stm32/pwr.h>
 
 #define	SPEED_NORMAL 1
 #define SPEED_SLOW   2
@@ -174,7 +179,7 @@ static void hal_priv_timer_setup() {
    */
   timer_set_period(TIM7, 4);
   timer_set_prescaler(TIM7, 5250);
-  timer_enable_irq(TIM7, TIM_DIER_UIE); // This call kills the USBUART
+  timer_enable_irq(TIM7, TIM_DIER_UIE);
 
   /*
    * timer 5 should just run and count up.
@@ -190,6 +195,7 @@ static void hal_priv_timer_setup() {
   timer_enable_counter(TIM3);
   timer_enable_counter(TIM4);
 }
+
 
 static void hal_priv_gpio_setup() {
   /** Input Pins **/
@@ -269,15 +275,36 @@ static void hal_priv_gpio_setup() {
   gpio_set_output_options(GPIOC, GPIO_OTYPE_PP, GPIO_OSPEED_100MHZ, GPIO4);
   gpio_set_output_options(GPIOC, GPIO_OTYPE_PP, GPIO_OSPEED_100MHZ, GPIO5);
   gpio_set_output_options(GPIOC, GPIO_OTYPE_PP, GPIO_OSPEED_100MHZ, GPIO6);
+
+  // init GPIO pins for debug output
+  gpio_mode_setup(GPIOC, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO9);
+  gpio_mode_setup(GPIOC, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO10);
+  gpio_mode_setup(GPIOC, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO11);
+  gpio_mode_setup(GPIOC, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO12);
+  gpio_mode_setup(GPIOC, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO13);
+  gpio_mode_setup(GPIOC, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO14);
+  gpio_mode_setup(GPIOC, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO15);
+  gpio_mode_setup(GPIOC, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO0);
+  gpio_set_output_options(GPIOC, GPIO_OTYPE_PP, GPIO_OSPEED_100MHZ, GPIO9);
+  gpio_set_output_options(GPIOC, GPIO_OTYPE_PP, GPIO_OSPEED_100MHZ, GPIO10);
+  gpio_set_output_options(GPIOC, GPIO_OTYPE_PP, GPIO_OSPEED_100MHZ, GPIO11);
+  gpio_set_output_options(GPIOC, GPIO_OTYPE_PP, GPIO_OSPEED_100MHZ, GPIO12);
+  gpio_set_output_options(GPIOC, GPIO_OTYPE_PP, GPIO_OSPEED_100MHZ, GPIO13);
+  gpio_set_output_options(GPIOC, GPIO_OTYPE_PP, GPIO_OSPEED_100MHZ, GPIO14);
+  gpio_set_output_options(GPIOC, GPIO_OTYPE_PP, GPIO_OSPEED_100MHZ, GPIO15);
+  gpio_set_output_options(GPIOC, GPIO_OTYPE_PP, GPIO_OSPEED_100MHZ, GPIO0);
+
 }
+
 
 static void hal_priv_isr_setup() {
   nvic_enable_irq(NVIC_TIM2_IRQ); /* enable TIM2 interrupt */
   nvic_enable_irq(NVIC_TIM3_IRQ); /* enable TIM3 interrupt */
   nvic_enable_irq(NVIC_TIM4_IRQ); /* enable TIM4 interrupt */
   nvic_enable_irq(NVIC_TIM5_IRQ); /* enable TIM5 interrupt */
-  nvic_enable_irq(NVIC_TIM7_IRQ); /* enable TIM6 interrupt */
+  nvic_enable_irq(NVIC_TIM7_IRQ); /* enable TIM7 interrupt */
 }
+
 
 void hal_system_clock(void) {
   /*
@@ -296,14 +323,39 @@ void hal_system_clock(void) {
   rcc_clock_setup_hse_3v3(&myConfig);
 }
 
+
 void hal_system_init(void) {
+  // Dis-/Enable flash prefetching
+  FLASH_ACR &= ~FLASH_ACR_PRFTEN;
+  //FLASH_ACR |= FLASH_ACR_PRFTEN;
+  // Dis-/Enable instruction cache (ART)
+  FLASH_ACR &= ~FLASH_ACR_ICE;
+  //FLASH_ACR |= FLASH_ACR_ICE;
+  // Dis-/Enable data cache
+  FLASH_ACR &= ~FLASH_ACR_DCE;
+  //FLASH_ACR |= FLASH_ACR_DCE;
+
   hal_priv_timer_setup();
   hal_priv_gpio_setup();
   hal_priv_isr_setup();
 }
 
+
 void hal_system_start(void) {
-  timer_enable_counter(TIM7); /* TIM5 is slower than TIM1 therefore it is started before */
+  timer_enable_counter(TIM7); /* TIM7 is slower than TIM1 therefore it is started before */
   timer_enable_counter(TIM1);
   timer_enable_counter(TIM5);
+}
+
+
+void hal_system_info(void) {
+  perf_printf("=================================================================\n");
+  perf_printf("System information for platform STM32F4-Discovery follows...\n");
+  perf_printf("FLASH_ACR: %08x\n", FLASH_ACR);
+  perf_printf("PWR_CR: %08x\n", PWR_CR);
+  perf_printf("RCC_CR: %08x\n", RCC_CR);
+  perf_printf("RCC_PLLCFGR: %08x\n", RCC_PLLCFGR);
+  perf_printf("RCC_CFGR: %08x\n", RCC_CFGR);
+
+  perf_printf("=================================================================\n");
 }

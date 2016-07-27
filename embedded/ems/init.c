@@ -503,8 +503,8 @@ void initAllPagedRAM() {
 /* All other variables are initialised to zero by the premain built in code*/
 void initVariables() {
   /* And the opposite for the other halves */
-  CoreVars = &CoreVars0;
-  DerivedVars = &DerivedVars0;
+  //CoreVars = &CoreVars0;
+  //DerivedVars = &DerivedVars0;
   ADCArrays = &ADCArrays0;
   ADCArraysRecord = &ADCArrays1;
   asyncADCArrays = &asyncADCArrays0;

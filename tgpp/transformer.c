@@ -18,7 +18,7 @@
  */
 
 /**
- * $Id: transformer.c 502 2015-11-05 14:18:19Z klugeflo $
+ * $Id: transformer.c 546 2016-07-15 06:51:19Z klugeflo $
  * @file transformer.h
  * @brief Tranformation of driving cycle operations to trace generator phases.
  * @author Florian Kluge <kluge@informatik.uni-augsburg.de>
@@ -146,7 +146,9 @@ int transform(const kv_file_t *cardata, const cycle_t *cycle, FILE* outfile) {
   operation_t *op_cur, *op_prev;
   op_prev = &prev;
   double om0 = cd.om_i;
-
+  double om_min = om0;
+  double om_max = om0;
+  
   write_head();
 
   for (i = 0; i < cycle->used_entries; ++i) {
@@ -178,13 +180,18 @@ int transform(const kv_file_t *cardata, const cycle_t *cycle, FILE* outfile) {
             printf("regular\n");
             om0 = perform_regular(om0, op_cur);
           }
-
+    //printf("\tom0: %f\n", om0);
+    if (om0 < om_min)
+      om_min = om0;
+    if (om0 > om_max)
+      om_max = om0;
     op_prev = op_cur;
   }
 
   write_foot();
 
   printf("Wrote %lu phases\n", n_phases);
+  printf("om_min: %f om_max: %f\n", om_min, om_max);
   return 0;
 }
 

@@ -58,6 +58,22 @@
 #include "inc/utils.h"
 #include <hal/ems/freeems_hal.h>
 #include <hal/log.h>
+#include <ems/performance.h>
+
+/*
+#ifdef __PERF__
+
+char PrimaryRPMISR_wrapped();
+
+void PrimaryRPMISR() {
+  hal_performance_startCounter();
+  char executionPathIdentifier = PrimaryRPMISR_wrapped();
+  unsigned long executionDuration = hal_performance_stopCounter();
+  perf_printf("*p%c%u\r\n", executionPathIdentifier, executionDuration);
+}
+
+#endif // __PERF__
+*/
 
 /** Primary RPM ISR
  *
@@ -86,14 +102,24 @@
  * @todo TODO bring the above docs up to date with reality
  * @todo TODO finish this off to a usable standard
  */
-void PrimaryRPMISR() {
-
+/*
+#ifdef __PERF__
+char PrimaryRPMISR_wrapped()
+#else
+void PrimaryRPMISR()
+#endif
+*/
+PERF_WRAP_PATH(PrimaryRPMISR, "p") {
   /* Save all relevant available data here */
   /* Save the current timer count */
   unsigned short codeStartTimeStamp = hal_timer_time_get();
 
+  PERF_PATH_INIT('x');
+
   /* Save the edge time stamp */
   unsigned short edgeTimeStamp = hal_timer_ic_capture_get(PRIMARY_RPM_INPUT);
+  //AM: this has changed a little. instead o a bit mask this value is now 1 if the pin is high or 0 otherwise.
+  //    the condition of the if a few lines later has to change too
   /* Save the values on port T regardless of the state of DDRT */
   unsigned char PTITCurrentState = hal_timer_ic_pin_get(PRIMARY_RPM_INPUT);
 
@@ -113,6 +139,9 @@ void PrimaryRPMISR() {
    * for us to schedule from, hence the trailing edge code is very simple.
    */
   if (PTITCurrentState) {
+    //log_printf("PRPM!\n");
+    /* Echo input condition on J7 */
+    hal_io_set(DEBUG_OUTPUT_8, 1);
 
     // increment crank pulses TODO this needs to be wrapped in tooth period and
     // width checking
@@ -127,7 +156,14 @@ void PrimaryRPMISR() {
     if (!(coreStatusA & PRIMARY_SYNC)) {
       log_printf("EP s1\r\n");
       primaryTeethDroppedFromLackOfSync++;
+      /*
+      #ifdef __PERF__
+      return executionPathIdentifier;
+      #else
       return;
+      #endif // __PERF__
+      */
+      PERF_PATH_RETURN();
     }
 
     LongTime timeStamp;
@@ -161,8 +197,18 @@ void PrimaryRPMISR() {
 
       /* Reset the count of teeth */
       primaryPulsesPerSecondaryPulse = 0;
+
+      //unsigned long executionDuration = hal_performance_stopCounter();
+      //perf_printf("*pb%u\r\n", executionDuration);
       /* Get the hell out of here before we do something bad */
+      /*
+      #ifdef __PERF__
+      return executionPathIdentifier;
+      #else
       return;
+      #endif // __PERF__
+      */
+      PERF_PATH_RETURN();
     }
 
     // CAUTION came to me lying in bed half asleep idea :
@@ -185,6 +231,8 @@ void PrimaryRPMISR() {
 
     // this will be done with an array and per tooth check in future
     if ((primaryPulsesPerSecondaryPulse % 2) == 0) {
+      PERF_PATH_SET('e');
+
       // TODO sample ADCs on teeth other than that used by the scheduler in
       //      order to minimise peak run time and get clean signals
       sampleEachADC(ADCArrays);
@@ -237,7 +285,14 @@ void PrimaryRPMISR() {
         unsigned char ignitionChannel = (primaryPulsesPerSecondaryPulse
                                          / 2) - 1;
         if (fuelChannel > 5 || ignitionChannel > 5) {
+          /*
+          #ifdef __PERF__
+          return executionPathIdentifier;
+          #else
           return;
+          #endif // __PERF__
+          */
+          PERF_PATH_RETURN();
         }
 
         // FAK: FIXME: channel 0 gets fired before injection!?!?
@@ -399,6 +454,12 @@ void PrimaryRPMISR() {
     else {
       RuntimeVars.primaryInputLeadingRuntime = hal_timer_time_get()
           - codeStartTimeStamp;
+      /*
+      #ifdef __PERF__
+      executionPathIdentifier = 'u';
+      #endif // __PERF__
+      */
+      PERF_PATH_SET('u');
     }
   }
   else {
@@ -419,7 +480,35 @@ void PrimaryRPMISR() {
   // if you say it quick, it doesn't sound like much :
   // schedule fuel and ign based on spark cut and fuel cut and timing vars and
   // status vars config vars
+
+
+  //unsigned long executionDuration = hal_performance_stopCounter();
+  //perf_printf("*p%c%u\r\n", executionPathIdentifier, executionDuration);
+  /*
+  #ifdef __PERF__
+  return executionPathIdentifier;
+  #else
+  return;
+  #endif // __PERF__
+  */
+  PERF_PATH_RETURN();
 }
+
+
+/*
+#ifdef __PERF__
+
+void SecondaryRPMISR_wrapped();
+
+void SecondaryRPMISR() {
+  hal_performance_startCounter();
+  SecondaryRPMISR_wrapped();
+  unsigned long executionDuration = hal_performance_stopCounter();
+  perf_printf("*s%u\r\n", executionDuration);
+}
+
+#endif // __PERF__
+*/
 
 /** Secondary RPM ISR
  *
@@ -428,8 +517,14 @@ void PrimaryRPMISR() {
  * @todo TODO bring this documentation up to date.
  * @todo TODO finish this off to a usable standard.
  */
-void SecondaryRPMISR() {
-
+/*
+#ifdef __PERF__
+void SecondaryRPMISR_wrapped()
+#else
+void SecondaryRPMISR()
+#endif // __PERF__
+*/
+PERF_WRAP_SIMPLE(SecondaryRPMISR, "s") {
   /* Save all relevant available data here */
   /* Save the current timer count */
   unsigned short codeStartTimeStamp = hal_timer_time_get();
@@ -455,8 +550,8 @@ void SecondaryRPMISR() {
    */
   if (hal_timer_ic_pin_get(SECONDARY_RPM_INPUT)) {
 
-// was this code like this because of a good reason?
-// primaryPulsesPerSecondaryPulseBuffer = primaryPulsesPerSecondaryPulse;
+    // was this code like this because of a good reason?
+    // primaryPulsesPerSecondaryPulseBuffer = primaryPulsesPerSecondaryPulse;
     primaryPulsesPerSecondaryPulse = 0;
 
     // if we didn't get the right number of pulses drop sync and start over
@@ -502,4 +597,7 @@ void SecondaryRPMISR() {
   /* If the flag is not cleared at the beginning then the interrupt gets
    * rescheduled while it is running, hence it can't be done at the end of the
    * ISR */
+
+  //unsigned long executionDuration = hal_performance_stopCounter();
+  //perf_printf("*s%u\r\n", executionDuration);
 }

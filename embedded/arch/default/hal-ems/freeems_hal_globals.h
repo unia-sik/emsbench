@@ -17,7 +17,7 @@
  * along with EmsBench.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * $Id: freeems_hal_globals.h 502 2015-11-05 14:18:19Z klugeflo $
+ * $Id: freeems_hal_globals.h 546 2016-07-15 06:51:19Z klugeflo $
  * @brief Various globally accessable fields.
  * @file freeems_hal_globals.h
  * @author Andreas Meixner, Claudius Heine,
@@ -29,6 +29,16 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+volatile uint16_t TIM2_CCR3_LAST;
+volatile uint16_t TIM2_CCR3_NEXT;
+volatile bool TIM2_CCR3_SET;
+
+volatile uint16_t TIM2_CCR4_LAST;
+volatile uint16_t TIM2_CCR4_NEXT;
+volatile bool TIM2_CCR4_SET;
+
+//channelid_t injectionOutputChannels[] = {INJECTION1_OUTPUT,INJECTION2_OUTPUT,INJECTION3_OUTPUT,INJECTION4_OUTPUT,INJECTION5_OUTPUT,INJECTION6_OUTPUT,INJECTION7_OUTPUT,INJECTION8_OUTPUT};
+//channelid_t ignitionChannels[] = {IGNITION1_OUTPUT,IGNITION2_OUTPUT,IGNITION3_OUTPUT,IGNITION4_OUTPUT,IGNITION5_OUTPUT,IGNITION6_OUTPUT,IGNITION7_OUTPUT,IGNITION8_OUTPUT};
 
 
 #endif /* FILE_FREEEMS_HAL_GLOBALS_H_SEEN */

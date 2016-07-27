@@ -1,4 +1,4 @@
-$Id: README 395 2015-10-02 14:22:13Z klugeflo $
+$Id: README 547 2016-07-15 07:06:50Z klugeflo $
 
 To build the EMS or Trace generator, use the build-[ems|tg].py scripts
 in this directory.
@@ -6,6 +6,7 @@ in this directory.
 Documentation on trace generation resp. porting EMSBench to other
 platforms can be found in the doc/ directory. Use the Makefiles
 provided in the respective subdirectories to build the documents.
+Platform-specific documentation is located under embedded/arch/$PLATFORM.
 
 The trace generator (tgpp and tg) are developed by University of Augsburg.
 The ems was derived by University of Augsburg from FreeEMS-0.1.1.
@@ -21,3 +22,4 @@ If you are using this software in your scientific work, please cite it as:
 Florian Kluge, Theo Ungerer, "EMSBench: Benchmark und Testumgebung für
 reaktive Systeme". In Echtzeit 2015, Nov. 2015, Boppard, Germany.
 
+For more information visit https://www.informatik.uni-augsburg.de/sik/emsbench/

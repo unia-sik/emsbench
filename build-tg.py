@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# $Id: build-tg.py 505 2015-11-06 13:50:23Z klugeflo $
+# $Id: build-tg.py 546 2016-07-15 06:51:19Z klugeflo $
 ################################################################################
 
 ################################################################################
@@ -15,6 +15,7 @@ from builder import *
 ################################################################################
 
 app = 'tg'
+appHal = 'tg'
 
 ################################################################################
 
@@ -89,9 +90,9 @@ else:
 
 # create tg build directory
 log.status("Creating traceGenerator build directory...")
-buildPath = buildpath.ensureBuildPath(args.platform, app)
+buildPath = buildpath.ensureBuildPath(args.platform, app, appHal)
 suppDefs = ["SUPP_C_SRC = trace.c"]
-buildpath.writeMakefile(os.path.basename(__file__), args.platform, app, suppDefs, args.log, args.debug, speed=args.speed)
+buildpath.writeMakefile(os.path.basename(__file__), args.platform, app, suppDefs, appHal, args.log, args.debug, speed=args.speed)
 
 # create tg input data
 log.status("Creating input data for traceGenerator...")

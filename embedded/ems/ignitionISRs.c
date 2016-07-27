@@ -43,6 +43,7 @@
 #include "inc/interrupts.h"
 #include "hal/ems/freeems_hal.h"
 #include <hal/log.h>
+#include <ems/performance.h>
 
 
 /* Summary of intended ignition timing scheme
@@ -75,9 +76,19 @@
  *
  * @todo TODO make this actually work.
  */
-void IgnitionDwellISR(void) {
+/*
+#ifdef __PERF__
+void IgnitionDwellISR_wrapped(void)
+#else
+void IgnitionDwellISR(void)
+#endif // __PERF__
+*/
+PERF_WRAP_SIMPLE(IgnitionDwellISR, "d") {
 
+  // LOG: store code start time and release time. this is only needed when logging is active
+  // LOG: unsigned short codeStartTimeStamp = hal_timer_time_get();
   CAPTURE_START_TIME();
+  //hal_performance_startCounter();
 
   log_printf("ID%u@%u %u\r\n", nextDwellChannel, hal_timer_pit_interval_get(IGNITION_DWELL_PIT), GET_START_TIME());
   // start dwelling asap
@@ -116,8 +127,25 @@ void IgnitionDwellISR(void) {
       }
     }
   }
+
+  //unsigned long executionDuration = hal_performance_stopCounter();
+  //perf_printf("*d%u-%d\r\n", nextDwellChannel, executionDuration);
 }
 
+/*
+#ifdef __PERF__
+
+void IgnitionFireISR_wrapped();
+
+void IgnitionFireISR() {
+  hal_performance_startCounter();
+  IgnitionFireISR_wrapped();
+  unsigned long executionDuration = hal_performance_stopCounter();
+  perf_printf("*f%u-%u\r\n", nextIgnitionChannel, executionDuration);
+}
+
+#endif // __PERF__
+*/
 
 /**	@brief Ignition discharge control
  *
@@ -127,7 +155,9 @@ void IgnitionDwellISR(void) {
  *
  * @todo TODO make this actually work.
  */
-void IgnitionFireISR(void) {
+PERF_WRAP_SIMPLE(IgnitionFireISR, "f") {
+  // LOG: store code start time and release time. This is only needed when logging is active
+  // LOG: unsigned short codeStartTimeStamp = hal_timer_time_get();
   CAPTURE_START_TIME();
 
   log_printf("IF%u@%u %u\r\n", nextIgnitionChannel, hal_timer_pit_interval_get(IGNITION_FIRE_PIT), GET_START_TIME());

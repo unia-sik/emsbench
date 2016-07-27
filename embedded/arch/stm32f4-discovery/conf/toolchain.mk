@@ -1,9 +1,10 @@
-# $Id: toolchain.mk 337 2015-07-03 14:02:23Z klugeflo $
+# $Id: toolchain.mk 546 2016-07-15 06:51:19Z klugeflo $
 # Toolchain used for building
 
 CC   = arm-none-eabi-gcc
 LD   = arm-none-eabi-gcc
 OBJC = arm-none-eabi-objcopy
+OBJD = arm-none-eabi-objdump
 
 MACH_FLAGS = -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mhard-float
 

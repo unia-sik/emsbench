@@ -41,8 +41,21 @@
 #include "inc/commsISRs.h"
 #include <hal/ems/freeems_hal.h>
 #include <hal/log.h>
+#include <ems/performance.h>
 
+/*#ifdef __PERF__
 
+void RTIISR_wrapped();
+
+void RTIISR() {
+  hal_performance_startCounter();
+  RTIISR_wrapped();
+  unsigned long executionDuration = hal_performance_stopCounter();
+  perf_printf("*rt%u\r\n", executionDuration);
+}
+
+#endif // __PERF__
+*/
 /** @brief Real Time Interrupt Handler
  *
  * Handles time keeping, including all internal clocks, and generic periodic
@@ -50,8 +63,15 @@
  *
  * @author Fred Cooke
  */
-void RTIISR() {
 
+/*#ifdef __PERF__
+void RTIISR_wrapped()
+#else
+void RTIISR()
+#endif // __PERF__*/
+PERF_WRAP_PATH(RTIISR, "rt") {
+//void RTIISR() {
+  PERF_PATH_INIT('x');
   /* Record time stamp for code run time reporting */
   unsigned short startTimeRTI = hal_timer_time_get();
 
@@ -66,6 +86,7 @@ void RTIISR() {
 
   /* Every 8th RTI execution is one milli */
   if(Clocks.realTimeClockMain % 8 == 0) {
+    PERF_PATH_SET('a');
     /* Increment the milli counter */
     Clocks.realTimeClockMillis++;
 
@@ -75,6 +96,7 @@ void RTIISR() {
     /* Perform all tasks that are once per millisecond here or preferably main*/
     Clocks.timeoutADCreadingClock++;
     if(Clocks.timeoutADCreadingClock > fixedConfigs2.sensorSettings.readingTimeout) {
+      PERF_PATH_SET('b');
       /* Set force read adc flag */
       coreStatusA |= FORCE_READING;
       Clocks.timeoutADCreadingClock = 0;
@@ -82,6 +104,7 @@ void RTIISR() {
 
     /* Every 100 millis is one tenth */
     if(Clocks.millisToTenths % 100 == 0) {
+      PERF_PATH_SET('c');
       /* Increment the tenths counter */
       Clocks.realTimeClockTenths++;
 
@@ -95,11 +118,13 @@ void RTIISR() {
        * preferably main */
       // decrement port H debounce variable till it's zero again.
       if(portHDebounce != 0) {
+	PERF_PATH_SET('d');
         portHDebounce -= 1;
       }
 
       /* Every 10 tenths is one second */
       if(Clocks.tenthsToSeconds % 10 == 0) {
+	PERF_PATH_SET('e');
         /* Increment the seconds counter */
         Clocks.realTimeClockSeconds++;
         XGSWT = 0x0101; /* set off software trigger 0 that is handled by xgate*/
@@ -113,6 +138,7 @@ void RTIISR() {
 
         /* Every 60 seconds is one minute, 65535 minutes is enough for us :-) */
         if(Clocks.secondsToMinutes % 60 == 0) {
+          PERF_PATH_SET('f');
           /* Increment the minutes counter */
           Clocks.realTimeClockMinutes++;
 
@@ -132,6 +158,7 @@ void RTIISR() {
     }
   }
   RuntimeVars.RTCRuntime = hal_timer_time_get() - startTimeRTI;
+  PERF_PATH_RETURN();
 }
 
 

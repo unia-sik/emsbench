@@ -34,7 +34,6 @@
 #ifndef FILE_INIT_H_SEEN
 #define FILE_INIT_H_SEEN
 
-
 #ifdef EXTERN
 #warning "EXTERN already defined by another header, please sort it out!"
 /* If fail on warning is off, remove the definition such that we can redefine

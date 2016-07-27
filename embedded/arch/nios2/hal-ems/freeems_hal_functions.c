@@ -17,7 +17,7 @@
  * along with EmsBench.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * $Id: freeems_hal_functions.c 502 2015-11-05 14:18:19Z klugeflo $
+ * $Id: freeems_hal_functions.c 560 2016-07-24 15:23:48Z meixnean $
  * @brief Implementation of nearly all HAL functions.
  * @file freeems_hal_functions.c
  * @author Andreas Meixner, Claudius Heine,
@@ -506,6 +506,36 @@ pinstate_t hal_io_get(channelid_t channel_id) {
   case IGNITION6_OUTPUT:
     retVal = (IORD32(A_PIO_IGN, 0) & 0x20) ? HIGH : LOW;
     break;
+  case IGNITION7_OUTPUT:
+    retVal = (IORD32(A_PIO_IGN, 0) & 0x40) ? HIGH : LOW;
+    break;
+  case IGNITION8_OUTPUT:
+    retVal = (IORD32(A_PIO_IGN, 0) & 0x80) ? HIGH : LOW;
+    break;
+  case DEBUG_OUTPUT_1:
+    retVal = (IORD32(A_PIO_IGN, 0) & 0x100) ? HIGH : LOW;
+    break;
+  case DEBUG_OUTPUT_2:
+    retVal = (IORD32(A_PIO_IGN, 0) & 0x200) ? HIGH : LOW;
+    break;
+  case DEBUG_OUTPUT_3:
+    retVal = (IORD32(A_PIO_IGN, 0) & 0x400) ? HIGH : LOW;
+    break;
+  case DEBUG_OUTPUT_4:
+    retVal = (IORD32(A_PIO_IGN, 0) & 0x800) ? HIGH : LOW;
+    break;
+  case DEBUG_OUTPUT_5:
+    retVal = (IORD32(A_PIO_IGN, 0) & 0x1000) ? HIGH : LOW;
+    break;
+  case DEBUG_OUTPUT_6:
+    retVal = (IORD32(A_PIO_IGN, 0) & 0x2000) ? HIGH : LOW;
+    break;
+  case DEBUG_OUTPUT_7:
+    retVal = (IORD32(A_PIO_IGN, 0) & 0x4000) ? HIGH : LOW;
+    break;
+  case DEBUG_OUTPUT_8:
+    retVal = (IORD32(A_PIO_IGN, 0) & 0x8000) ? HIGH : LOW;
+    break;
   default:
     log_printf("ERROR: invalid channel ID (%d) for hal_io_get\r\n",
                channel_id);
@@ -566,6 +596,87 @@ void hal_io_set(channelid_t channel_id, pinstate_t value) {
       registerValue = registerValue & (~0x20);
     }
     break;
+  case IGNITION7_OUTPUT:
+      if (value == HIGH) {
+        registerValue = registerValue | 0x40;
+      }
+      else {
+        registerValue = registerValue & (~0x40);
+      }
+      break;
+  case IGNITION8_OUTPUT:
+      if (value == HIGH) {
+        registerValue = registerValue | 0x80;
+      }
+      else {
+        registerValue = registerValue & (~0x80);
+      }
+      break;
+
+  case DEBUG_OUTPUT_1:
+      if (value == HIGH) {
+        registerValue = registerValue | 0x100;
+      }
+      else {
+        registerValue = registerValue & (~0x100);
+      }
+      break;
+  case DEBUG_OUTPUT_2:
+      if (value == HIGH) {
+        registerValue = registerValue | 0x200;
+      }
+      else {
+        registerValue = registerValue & (~0x200);
+      }
+      break;
+  case DEBUG_OUTPUT_3:
+      if (value == HIGH) {
+        registerValue = registerValue | 0x400;
+      }
+      else {
+        registerValue = registerValue & (~0x400);
+      }
+      break;
+  case DEBUG_OUTPUT_4:
+      if (value == HIGH) {
+        registerValue = registerValue | 0x800;
+      }
+      else {
+        registerValue = registerValue & (~0x800);
+      }
+      break;
+  case DEBUG_OUTPUT_5:
+      if (value == HIGH) {
+        registerValue = registerValue | 0x1000;
+      }
+      else {
+        registerValue = registerValue & (~0x1000);
+      }
+      break;
+  case DEBUG_OUTPUT_6:
+      if (value == HIGH) {
+        registerValue = registerValue | 0x2000;
+      }
+      else {
+        registerValue = registerValue & (~0x2000);
+      }
+      break;
+  case DEBUG_OUTPUT_7:
+      if (value == HIGH) {
+        registerValue = registerValue | 0x4000;
+      }
+      else {
+        registerValue = registerValue & (~0x4000);
+      }
+      break;
+  case DEBUG_OUTPUT_8:
+      if (value == HIGH) {
+        registerValue = registerValue | 0x8000;
+      }
+      else {
+        registerValue = registerValue & (~0x8000);
+      }
+      break;
   default:
     log_printf("ERROR: invalid channel ID (%d) for hal_io_set\r\n",
                channel_id);

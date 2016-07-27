@@ -2,4 +2,4 @@
 # List all hal source files
 
 HAP_C_SRC = freeems_hal_functions.c freeems_hal_globals.c freeems_hal_init.c freeems_hal_interrupts.c
-HAP_S_SRC =
+HAP_S_SRC = freeems_hal_ubench.S

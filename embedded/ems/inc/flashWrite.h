@@ -34,6 +34,7 @@
 #ifndef FILE_FLASHWRITE_H_SEEN
 #define FILE_FLASHWRITE_H_SEEN
 
+#include <stdint.h>
 
 #ifdef EXTERN
 #warning "EXTERN already defined by another header, please sort it out!"

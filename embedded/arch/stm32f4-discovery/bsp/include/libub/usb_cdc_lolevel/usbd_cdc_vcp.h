@@ -29,7 +29,7 @@ typedef struct
 
 
 
-#define APP_TX_BUF_SIZE         128  // Grösse vom RX-Puffer in Bytes (32,64,128,256 usw)
+#define APP_TX_BUF_SIZE         128  // Groesse vom RX-Puffer in Bytes (32,64,128,256 usw)
 #define APP_TX_BUF_MASK       (APP_TX_BUF_SIZE-1)
 #define  USB_CDC_RX_END_CHR    0x0D  // Endekennung (Ascii-Wert)
 #define  USB_CDC_FIRST_ASCII   32    // erstes Ascii-Zeichen

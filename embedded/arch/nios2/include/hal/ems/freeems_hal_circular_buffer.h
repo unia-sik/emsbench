@@ -17,7 +17,7 @@
  * along with EmsBench.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * $Id: freeems_hal_circular_buffer.h 502 2015-11-05 14:18:19Z klugeflo $
+ * $Id: freeems_hal_circular_buffer.h 546 2016-07-15 06:51:19Z klugeflo $
  * @brief Implementation of a circular buffer needed for performance logging on
  *        nios2 architecture.
  * @file freeems_hal_circular_buffer.h
@@ -52,7 +52,7 @@
  * of 2 e.g. 1024 (1kb), 4096 (4kb), 4194304 (4M), ....
  * This value may be changed.
  */
-#define BUFFER_SIZE 4194304
+#define BUFFER_SIZE 16777216
 /**
  * @autorh Andreas Meixner
  * @brief Defines the bitmask for fast modula calculations.

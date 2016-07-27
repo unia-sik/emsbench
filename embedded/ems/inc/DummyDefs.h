@@ -29,6 +29,8 @@
 #ifndef FILE_DUMMYDEFS_H_SEEN
 #define FILE_DUMMYDEFS_H_SEEN
 
+#include <stdint.h>
+
 extern volatile unsigned char ARMCOP; // DVUCP(0x003F)
 extern volatile unsigned char ATD0CTL0; // DVUCP(0x02C0)
 extern volatile unsigned char ATD0CTL1; // DVUCP(0x02C1)
@@ -328,7 +330,7 @@ extern volatile unsigned short * _PAB;
 #define SCI0_BASE ((uintptr_t)&SCI0BD)
 
 #define DVUCP(address) (*((volatile unsigned char*)(address)))
-#define DVUSP(address) (*((volatile unsigned short*)(address)))
+#define DVUSP(address) (*((volatile uintptr_t*)(address)))
 
 #define AVUCP(address) ((volatile unsigned char*)(address))
 #define AVUSP(address) ((volatile unsigned short*)(address))

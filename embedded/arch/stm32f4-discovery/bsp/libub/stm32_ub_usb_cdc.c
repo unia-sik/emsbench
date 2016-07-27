@@ -13,14 +13,14 @@
 // Hinweis  : auf dem PC muss der Treiber von ST
 //            "VirtualComportDriver" installiert sein (V:1.3.1)
 //            nur dann wird beim Verbinden ein VirtuellerComPort
-//            im Gerätemanager angezeigt
+//            im Geraetemanager angezeigt
 //
 //            Beim Discovery-Modul funktioniert nur der
 //            USB-FullSpeed-Mode (USB-High-Speed geht nicht)
 //
 // Vorsicht : Als Endekennung beim Empfangen, muss der Sender
 //            das Zeichen "0x0D" = Carriage-Return
-//            an den String anhängen !!
+//            an den String anhaengen !!
 //--------------------------------------------------------------
 //              PA8   -> USB_OTG_SOF (wird nicht benutzt)
 //              PA9   -> USB_OTG_VBUS

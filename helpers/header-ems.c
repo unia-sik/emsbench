@@ -18,7 +18,7 @@
  */
 
 /**
- * $Id: header-ems.c 502 2015-11-05 14:18:19Z klugeflo $
+ * $Id: header-ems.c 564 2016-07-27 10:59:18Z klugeflo $
  * @file FILE
  * @brief 
  * @author Andreas Meixner, Claudius Heine,

@@ -1,5 +1,5 @@
 #!/bin/bash
-# $Id: adjust_style.sh 473 2015-10-26 13:02:06Z klugeflo $
+# $Id: adjust_style.sh 564 2016-07-27 10:59:18Z klugeflo $
 # Format all source files of the project
 # Call this script before committing anything!
 

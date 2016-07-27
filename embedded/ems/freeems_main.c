@@ -39,6 +39,10 @@
 #include <hal/log.h>
 #include "inc/main.h"
 
+#ifdef __PERF__
+void performBaseMeasurements();
+#endif // __PERF__
+
 /** @brief The main function!
  *
  * The centre of the application is here. From here all non-ISR code is called
@@ -60,6 +64,12 @@ int main_freeems() { // TODO maybe move this to paged flash ?
   // Set everything up.
   init();
   coreStatusA |= PRIMARY_SYNC;
+
+#ifdef __PERF__
+  performBaseMeasurements();
+  unsigned int duration;// = 200000;
+#endif
+
   // Run forever repeating.
   while (TRUE) {
     /* If ADCs require forced sampling, sample now */
@@ -67,7 +77,9 @@ int main_freeems() { // TODO maybe move this to paged flash ?
       ATOMIC_START()
       ; /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
       /* Atomic block to ensure a full set of readings are taken together */
-
+#ifdef __PERF__
+      hal_performance_startCounter();
+#endif
       /* Check to ensure that a reading wasn't take before we entered a non
        * interruptable state */
       if (coreStatusA & FORCE_READING) {
@@ -84,7 +96,10 @@ int main_freeems() { // TODO maybe move this to paged flash ?
         /* Clear force reading flag */
         coreStatusA &= CLEAR_FORCE_READING;
       }
-
+#ifdef __PERF__
+      duration = hal_performance_stopCounter();
+      perf_printf("*r%u\r\n", duration);
+#endif
       ATOMIC_END(); /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
     }
 
@@ -94,6 +109,9 @@ int main_freeems() { // TODO maybe move this to paged flash ?
       ; /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
       /* Atomic block to ensure that we don't clear the flag for the next data
        * set when things are tight */
+#ifdef __PERF__
+      hal_performance_startCounter();
+#endif
 
       /* Switch input bank so that we have a stable set of the latest data */
       if (ADCArrays == &ADCArrays1) {
@@ -121,6 +139,10 @@ int main_freeems() { // TODO maybe move this to paged flash ?
 
       /* Clear the calc required flag */
       coreStatusA &= CLEAR_CALC_FUEL_IGN;
+#ifdef __PERF__
+      duration = hal_performance_stopCounter();
+      perf_printf("*sr%u\r\n", duration);
+#endif
 
       ATOMIC_END(); /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
 
@@ -162,7 +184,9 @@ int main_freeems() { // TODO maybe move this to paged flash ?
       ATOMIC_START()
       ; /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
       /* Atomic block to ensure that outputBank and outputBank Offsets match */
-
+#ifdef __PERF__
+      hal_performance_startCounter();
+#endif
       /* Switch banks to the latest data */
       if (injectorMainPulseWidthsMath == injectorMainPulseWidths1) {
         currentDwellMath = &currentDwell0;
@@ -180,6 +204,10 @@ int main_freeems() { // TODO maybe move this to paged flash ?
         injectorStagedPulseWidthsMath = injectorStagedPulseWidths1;
         injectorStagedPulseWidthsRealtime = injectorStagedPulseWidths0;
       }
+#ifdef __PERF__
+      duration = hal_performance_stopCounter();
+      perf_printf("*sii%u\r\n", duration);
+#endif
 
       ATOMIC_END(); /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
     }
@@ -294,3 +322,25 @@ int main_freeems() { // TODO maybe move this to paged flash ?
     output_performance_log();
   }
 }
+
+
+#ifdef __PERF__
+
+void performBaseMeasurements() {
+  ATOMIC_START();
+  debug_printf("debug performBaseMeasurements\n");
+  perf_printf("perf performBaseMeasurements\n");
+  unsigned int executionDuration;
+  // Each measurement is performed twice to eliminat cache effects
+  // 1) Performanc counting
+  hal_performance_startCounter();
+  executionDuration = hal_performance_stopCounter();
+  perf_printf("**MeasB 1: %u\r\n", executionDuration);
+  // performe twice do get difference
+  hal_performance_startCounter();
+  executionDuration = hal_performance_stopCounter();
+  perf_printf("**MeasB 2: %u\r\n", executionDuration);
+  ATOMIC_END();
+}
+
+#endif // __PERF__

@@ -17,7 +17,7 @@
  * along with EmsBench.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * $Id: hal_init.h 502 2015-11-05 14:18:19Z klugeflo $
+ * $Id: hal_init.h 546 2016-07-15 06:51:19Z klugeflo $
  * @ingroup halInterface
  * @brief All the functions needed to initialize the HAL.
  * @author Andreas Meixner, Claudius Heine,
@@ -48,5 +48,16 @@ extern void hal_system_clock(void);
  */
 extern void hal_system_init(void);
 
+
+/**
+ * @brief Print HAL/system information.
+ * @author Florian Kluge
+ * 
+ * This helper function is called during system startup after the system
+ * has been initialised. Use it to output information that is relevant
+ * for your evaluation.
+ */
+
+extern void hal_system_info(void);
 
 #endif /* HAL_INIT_H_ */

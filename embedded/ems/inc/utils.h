@@ -35,6 +35,8 @@
 #define FILE_UTILS_H_SEEN
 
 
+#include <stdint.h>
+
 #ifdef EXTERN
 #warning "EXTERN already defined by another header, please sort it out!"
 /* If fail on warning is off, remove the definition such that we can redefine

@@ -1,5 +1,5 @@
 /**
- * $Id: head.tpl 198 2015-01-28 17:00:03Z klugeflo $
+ * $Id: head.tpl 564 2016-07-27 10:59:18Z klugeflo $
  * @file FILE
  * @brief
  * @author Florian Kluge <kluge@informatik.uni-augsburg.de>

@@ -209,6 +209,7 @@ SECTIONS
         *(.rwdata .rwdata.*)
         *(.sdata .sdata.* .gnu.linkonce.s.*)
         *(.sdata2 .sdata2.* .gnu.linkonce.s2.*)
+	*(.io)
 
         . = ALIGN(4);
         _edata = ABSOLUTE(.);

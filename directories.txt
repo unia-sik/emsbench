@@ -1,4 +1,4 @@
-$Id: directories.txt 366 2015-09-09 09:36:11Z klugeflo $
+$Id: directories.txt 546 2016-07-15 06:51:19Z klugeflo $
 
 |
 +- data			Configuration files for cars and driving profiles
@@ -7,7 +7,7 @@ $Id: directories.txt 366 2015-09-09 09:36:11Z klugeflo $
 |
 +- embedded		Code running on embedded processors
 |  |
-|  +- arch		Architecture-dependant code
+|  +- arch		Architecture-dependent code
 |  |  |
 |  |  +- default	Template for $ARCH (below)
 |  |  |  |
@@ -39,9 +39,11 @@ $Id: directories.txt 366 2015-09-09 09:36:11Z klugeflo $
 |  |  .  +- hal-$(APP)
 |  |  .  +- $(APP)
 |  |
-|  +- ems		EMS implementation (architecture independant, uses HAL)
+|  +- ems		EMS implementation (architecture independent, uses HAL)
 |  |
-|  +- tg		Trace generator (architecture independant, uses HAL)
+|  +- tg		Trace generator (architecture independent, uses HAL)
+|  |
+|  +- ubench		Micro-Benchmarks for validation of WCET model (architecture independent, uses HAL)
 |
 +- tgpp			Trace Generator PreProcessor (running on HOST)
 

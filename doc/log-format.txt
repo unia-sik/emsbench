@@ -1,4 +1,4 @@
-$Id: log-format.txt 458 2015-10-23 13:02:00Z meixnean $
+$Id: log-format.txt 546 2016-07-15 06:51:19Z klugeflo $
 
 Trace Generator:
 ================
@@ -55,9 +55,17 @@ P1: this was the first pulse, doe nothing
 
 P@->0: this was the LOW edge of signal, do nothing
 
+*p[X][T]: [T] is the runtime of PrimaryPRMISR measured in processor cycles.
+		  [X] identifyes the codepath that was executed. Possible values are
+		  	 a: missing sync (see also "EP s1" above)
+		  	 b: lost sync (see also "EP s2" above) 
+		  	 e: an even number of primary signals are counted and calculations
+		  	    have to be performed (see also "P2" above)
+		  	 u: an uneven number of primary pulses have been counted so nothing is done.
+
 SecondaryRPMISR:
 --------------
-
+*s[T]: [T] is the runtime of SecondaryPRMISR measured in processor cycles.
 
 InjectorXISR:
 -------------
@@ -69,6 +77,10 @@ Nl[A]@[B]: injector channel [A] pulled to LOW at time [B]
 
 Nlur@[A]: set HIGH time for another injection at time [A]
 
+*i[X][A]-[T]: [T] is the runtime of Injector[A]ISR measured in processor cycles.
+			  [X] identifyes the codepath that was executed. Possilbe values are
+			  	  h: injection was started by pulling the output pin to high
+			  	  l: injection was ended by pulling the output pin to low. 
 
 IgnitionDwellISR:
 -----------------
@@ -78,7 +90,7 @@ ID[A]@[B] [C]: dwelling of ignition coil for channel [A] after counter
 IDr[A]@[B]: set a queued dwell event for channel [A] with time offset
 [B]
 
-
+*d[A]-[T]: [T] is the runtime of IgnitionDwellISR for channel [A] measured in processor cycles.
 
 IgnitionFireISR:
 ----------------
@@ -88,3 +100,35 @@ elapsed, ISR started at time [C]
 IFr[A]@[B]: set a queued dwell event for channel [A] with time offset
 [B]
 
+*f[A]-[T]: [T] is the runtime of IgnitionFireISR for channel [A] measured in processor cycles.
+
+RTIISR:
+-------
+*rtX[T]: [T] is the runtime of the RTIISR() function that gets called every 125us.
+         X can be one of the following path identifiers
+          x : nothing had to be done.
+          a : only the ms (mili second) counter was counted up.
+          b : ms counter was counted up and the 'force ADC reading'
+              flag was set.
+          c : the ms and 1/10-th counter was counted up. Maybe the 'force ADC 
+              reading' flag was set. 
+          d : the ms and 1/10-th counter was counted up and evrythich that has to
+              be done every 0.1s was executed. For now only portHDebounce is 
+              decremented by one. Maybe the 'force ADC reading' flag was set. 
+          e : the ms 1/10th and second counter were counted up. Maybe the
+              'force ADC reading' flag was set and or portHDebounce was decreased
+              by one.  
+          f : the ms 1/10th, second and minute counter were counted up. Maybe the
+              'force ADC reading' flag was set and or portHDebounce was decreased
+              by one.
+
+freeems_main:
+-------------
+*r[T]: [T] ist the runtime oft the atomic code block in main_freeems where the current sensor data is being read.
+
+*sr[T]: [T] is the runtime of the atomic code block in main_freeems where the sensor data sets are swapped before 
+performing ignition and injection calculations.
+
+*sii[T]: [T] is the runtime of the atomic code block in main_freeems where the datasets containing the calculated 
+injection and ignition values are swapped. 
+ 

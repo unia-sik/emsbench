@@ -1,5 +1,5 @@
 ###############################################################################
-# $Id: buildpath.py 504 2015-11-06 13:31:24Z klugeflo $
+# $Id: buildpath.py 546 2016-07-15 06:51:19Z klugeflo $
 ###############################################################################
 
 import data
@@ -39,18 +39,18 @@ def makePath(platform, app):
 
 ###############################################################################
 
-def ensureBuildPath(platform, app):
+def ensureBuildPath(platform, app, appHal):
     path = makePath(platform, app)
     ensureCleanDirectoryExists(path)
     ensureDirectoryExists(path + '/hal')
-    ensureDirectoryExists(path + '/hal-' + app)
+    ensureDirectoryExists(path + '/hal-' + appHal)
     ensureDirectoryExists(path + '/' + app)
     # TODO: write Makefile
     return path
 
 ###############################################################################
 
-def writeMakefile(prog, platform, app, suppDefs, log=False, debug=False, perf=False, speed=data.DEFAULT_SPEED):
+def writeMakefile(prog, platform, app, suppDefs, halApp, log=False, debug=False, perf=False, speed=data.DEFAULT_SPEED):
     """Create the Makefile
     platform -- Platform name
     app -- application name
@@ -65,6 +65,7 @@ def writeMakefile(prog, platform, app, suppDefs, log=False, debug=False, perf=Fa
         makefile.write("\n")
         makefile.write("ARCH = " + platform + "\n")
         makefile.write("APP = " + app + "\n")
+        makefile.write("HAL_APP = " + halApp + "\n")
         makefile.write("BASE = " + data.BUILD_PATH_REL_BASE + "\n")
         makefile.write("CPPFLAGS += -D__SPEED__" + speed + "\n")
         if (log):

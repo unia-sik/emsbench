@@ -182,16 +182,25 @@ EXTERN ISRLatencyVar ISRLatencyVars;
  * parameter tracking and is well worth the extra memory expense and
  * complication.
  */
-/** Pointer to the core running variables */
-EXTERN CoreVar* CoreVars;
-/** Bank 0 core running variables */
-EXTERN CoreVar CoreVars0;
+
+//EXTERN CoreVar* CoreVars;			/** Pointer to the core running variables */
+EXTERN CoreVar CoreVars0;			/** Bank 0 core running variables */
+
+/**
+ * WCET analysis cannot analyse the CoreVars pointer. As there is only
+ * one set of corevars anyway, we directly point there without changing
+ * much of the code.
+ */
+#define CoreVars (&CoreVars0)
 /* If we move to xgate or isr driven logging, add bank 1 back in */
 
-/** Pointer to the secondary running variables */
-EXTERN DerivedVar* DerivedVars;
-/** Bank 0 secondary running variables */
-EXTERN DerivedVar DerivedVars0;
+//EXTERN DerivedVar* DerivedVars;		/** Pointer to the secondary running variables */
+EXTERN DerivedVar DerivedVars0;		/** Bank 0 secondary running variables */
+/**
+ * @see #CoreVars
+ */
+#define DerivedVars (&DerivedVars0)
+
 /* If we move to xgate or isr driven logging, add bank 1 back in */
 
 /** main adc storage area for syncronous sampling in the engine position ISR or

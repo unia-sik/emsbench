@@ -17,7 +17,7 @@
  * along with EmsBench.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * $Id: freeems_hal_functions.c 502 2015-11-05 14:18:19Z klugeflo $
+ * $Id: freeems_hal_functions.c 561 2016-07-24 15:24:52Z meixnean $
  * @brief Implementation of nearly all HAL functions.
  * @file freeems_hal_functions.c
  * @author Andreas Meixner, Claudius Heine,
@@ -332,6 +332,30 @@ pinstate_t hal_io_get(channelid_t channel_id) {
   case IGNITION6_OUTPUT:
     retVal = gpio_get(GPIOC, GPIO6) ? HIGH : LOW;
     break;
+  case DEBUG_OUTPUT_1:
+    retVal = gpio_get(GPIOC, GPIO9) ? HIGH : LOW;
+    break;
+  case DEBUG_OUTPUT_2:
+    retVal = gpio_get(GPIOC, GPIO10) ? HIGH : LOW;
+    break;
+  case DEBUG_OUTPUT_3:
+    retVal = gpio_get(GPIOC, GPIO11) ? HIGH : LOW;
+    break;
+  case DEBUG_OUTPUT_4:
+    retVal = gpio_get(GPIOC, GPIO12) ? HIGH : LOW;
+    break;
+  case DEBUG_OUTPUT_5:
+    retVal = gpio_get(GPIOC, GPIO13) ? HIGH : LOW;
+    break;
+  case DEBUG_OUTPUT_6:
+    retVal = gpio_get(GPIOC, GPIO14) ? HIGH : LOW;
+    break;
+  case DEBUG_OUTPUT_7:
+    retVal = gpio_get(GPIOC, GPIO15) ? HIGH : LOW;
+    break;
+  case DEBUG_OUTPUT_8:
+    retVal = gpio_get(GPIOC, GPIO0) ? HIGH : LOW;
+    break;
   default:
     log_printf("ERROR: invalid channel ID (%d) for hal_io_get\r\n",
                channel_id);
@@ -388,6 +412,70 @@ void hal_io_set(channelid_t channel_id, pinstate_t value) {
     }
     else {
       gpio_clear(GPIOC, GPIO6);
+    }
+    break;
+  case DEBUG_OUTPUT_1:
+    if (value == HIGH) {
+      gpio_set(GPIOC, GPIO9);
+    }
+    else {
+      gpio_clear(GPIOC, GPIO9);
+    }
+    break;
+  case DEBUG_OUTPUT_2:
+    if (value == HIGH) {
+      gpio_set(GPIOC, GPIO10);
+    }
+    else {
+      gpio_clear(GPIOC, GPIO10);
+    }
+    break;
+  case DEBUG_OUTPUT_3:
+    if (value == HIGH) {
+      gpio_set(GPIOC, GPIO11);
+    }
+    else {
+      gpio_clear(GPIOC, GPIO11);
+    }
+    break;
+  case DEBUG_OUTPUT_4:
+    if (value == HIGH) {
+      gpio_set(GPIOC, GPIO12);
+    }
+    else {
+      gpio_clear(GPIOC, GPIO12);
+    }
+    break;
+  case DEBUG_OUTPUT_5:
+    if (value == HIGH) {
+      gpio_set(GPIOC, GPIO13);
+    }
+    else {
+      gpio_clear(GPIOC, GPIO13);
+    }
+    break;
+  case DEBUG_OUTPUT_6:
+    if (value == HIGH) {
+      gpio_set(GPIOC, GPIO14);
+    }
+    else {
+      gpio_clear(GPIOC, GPIO14);
+    }
+    break;
+  case DEBUG_OUTPUT_7:
+    if (value == HIGH) {
+      gpio_set(GPIOC, GPIO15);
+    }
+    else {
+      gpio_clear(GPIOC, GPIO15);
+    }
+    break;
+  case DEBUG_OUTPUT_8:
+    if (value == HIGH) {
+      gpio_set(GPIOC, GPIO0);
+    }
+    else {
+      gpio_clear(GPIOC, GPIO0);
     }
     break;
   default:

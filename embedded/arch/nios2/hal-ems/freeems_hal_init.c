@@ -17,7 +17,7 @@
  * along with EmsBench.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * $Id: freeems_hal_init.c 512 2015-11-10 15:29:05Z meixnean $
+ * $Id: freeems_hal_init.c 546 2016-07-15 06:51:19Z klugeflo $
  * @brief Implementation of initialization functions.
  * @file freeems_hal_init.c
  * @author Andreas Meixner, Claudius Heine,
@@ -99,4 +99,8 @@ void hal_system_start(void) {
   uint32_t sr = __rdctl_status();
   sr |= SPR_SR_PIE;
   __wrctl_status(sr);
+}
+
+
+void hal_system_info(void) {
 }

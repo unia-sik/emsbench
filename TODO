@@ -1,0 +1,24 @@
+$Id: TODO 564 2016-07-27 10:59:18Z klugeflo $
+
+- Possible bug in original FreeEMS implementation and our (simplifying)
+  adjustments lead to unrealistic behaviour:
+
+  The cycle for one channel consists of PrimaryRPMISR, InjectionISR opening
+  and closing the valve, IgnitionDwellISR and IgnitionFireISR.
+  When executing EMSBench, the times for most these ISRs are constant
+  (relative to the PrimaryRPMISR), and only the time of closing the injection
+  valve varies. This means, that the amount of fuel injected into the engine
+  varies. Assuming the adjustments we made to the code, we would rather expect
+  that the injection time is constant, but the IgnitionFire should vary
+  as it clearly must depend on the engine's current speed.
+  Concerning the injection, there seems to be a bug in the original
+  implementation, which we expect to be fixed in newer versions. The
+  constant offset for IgnitionFire is related to our adjustments, where
+  where we set a constant number (fuelAndIgnitionCalcs.c:198, see comment
+  there).
+
+  Possible solutions:
+  1) Use current version of FreeEMS for EMSBench, or
+  2) Backport corrections from current version
+  Both solutions are expected to require a large effort!
+  

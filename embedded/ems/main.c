@@ -39,8 +39,9 @@ int main(void) {
   log_init();
 
   debug_puts("Initializing stuff!\r\n");
-
   hal_system_init();
+
+  hal_system_info();
 
   debug_puts("Starting Timers!\r\n");
   hal_system_start();

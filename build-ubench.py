@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# $Id: build-ems.py 546 2016-07-15 06:51:19Z klugeflo $
+# $Id: build-ubench.py 546 2016-07-15 06:51:19Z klugeflo $
 ################################################################################
 
 ################################################################################
@@ -14,7 +14,7 @@ from builder import *
 
 ################################################################################
 
-app = 'ems'
+app = 'ubench'
 appHal = 'ems'
 
 ################################################################################
@@ -49,9 +49,9 @@ args = parser.parse_args()
 checkArgs(args)
 
 # create ems build directory
-log.status("Creating EMS build directory...")
+log.status("Creating uBench build directory...")
 buildPath = buildpath.ensureBuildPath(args.platform, app, appHal)
-buildpath.writeMakefile(os.path.basename(__file__), args.platform, app, "", appHal, args.log, args.debug, args.perf, args.speed)
+buildpath.writeMakefile(os.path.basename(__file__), args.platform, app, "", appHal, args.log, args.debug, args.perf)
 
 # build arch-dep
 # build BSP for ems
@@ -62,7 +62,7 @@ else:
     log.info("No BSP necessary")
 
 # build ems
-log.status("Building EMS...")
+log.status("Building uBench...")
 state = os.system("make -C " + buildPath + args.verbose)
 
 

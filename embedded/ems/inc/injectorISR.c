@@ -29,6 +29,7 @@
  */
 
 #include <hal/ems/freeems_hal.h>
+#include <ems/performance.h>
 
 /**	@file injectorISR.c
  *
@@ -63,12 +64,41 @@
  *
  * @author Fred Cooke
  */
+/*
+#ifdef __PERF__
 
+char InjectorXISR_wrapped();
 
 void InjectorXISR() {
+  hal_performance_startCounter();
+  char executionPathIdentifier = InjectorXISR_wrapped();
+  unsigned long executionDuration = hal_performance_stopCounter();
+  perf_printf("*i%c%u-%u\r\n", executionPathIdentifier, INJECTOR_CHANNEL_NUMBER, executionDuration);
+}
+
+#endif // __PERF__
+*/
+
+/*
+#ifdef __PERF__
+char InjectorXISR_wrapped()
+#else
+void InjectorXISR()
+#endif
+*/
+#define STR(X) _STR(X)
+#define _STR(X) #X
+PERF_WRAP_PATH(InjectorXISR, "i" STR(INJECTOR_CHANNEL_NUMBER)) {
 
   /* Record the current time as start time */
   unsigned short TCNTStart = hal_timer_time_get();
+  /*
+  #ifdef __PERF__
+  char executionPathIdentifier = 'x';
+  #endif
+  */
+  //hal_performance_startCounter();
+  PERF_PATH_INIT('x');
 
   /* Record the edge time stamp from the IC register */
   unsigned short edgeTimeStamp = hal_timer_oc_compare_get(INJECTIONX_OUTPUT(INJECTOR_CHANNEL_NUMBER));
@@ -78,6 +108,12 @@ void InjectorXISR() {
 
   /* If rising edge triggered this */
   if(hal_timer_oc_pin_get(INJECTIONX_OUTPUT(INJECTOR_CHANNEL_NUMBER)) == HIGH) {
+    /*
+    #ifdef __PERF__
+    executionPathIdentifier = 'h';
+    #endif
+    */
+    PERF_PATH_SET('h');
 
     /* Find out what max and min for pulse width are */
     unsigned short localPulseWidth = injectorMainPulseWidthsRealtime[INJECTOR_CHANNEL_NUMBER];
@@ -136,6 +172,7 @@ void InjectorXISR() {
     injectorCodeOpenRuntimes[INJECTOR_CHANNEL_NUMBER] = hal_timer_time_get() - TCNTStart;
   }
   else { // Stuff for switch off time
+    PERF_PATH_SET('l');
     log_printf("Nl%u@%u\r\n", INJECTOR_CHANNEL_NUMBER, edgeTimeStamp);
     /* If we switched the staged injector on and it's still on, turn it off now.*/
     if (stagedOn & STAGEDXON) {
@@ -160,4 +197,15 @@ void InjectorXISR() {
     /* Calculate and store code run time */
     injectorCodeCloseRuntimes[INJECTOR_CHANNEL_NUMBER] = hal_timer_time_get() - TCNTStart;
   }
+
+  //unsigned long executionDuration = hal_performance_stopCounter();
+  //perf_printf("*i%c%u-%u\r\n", executionPathIdentifyer, INJECTOR_CHANNEL_NUMBER, executionDuration);
+  /*
+  #ifdef __PERF__
+  	return executionPathIdentifier;
+  #else
+  	return;
+  #endif // __PERF__
+  */
+  PERF_PATH_RETURN();
 }

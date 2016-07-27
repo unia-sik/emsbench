@@ -90,10 +90,12 @@ void StagedOffISR(void) {
 /* Channel 1 */
 #define INJECTOR_CHANNEL_NUMBER 0
 #define InjectorXISR Injector1ISR
+#define InjectorXISR_wrapped Injector1ISR_wrapped
 #define STAGEDXOFF STAGED1OFF
 #define STAGEDXON STAGED1ON
 #include "inc/injectorISR.c"
 #undef InjectorXISR
+#undef InjectorXISR_wrapped
 #undef STAGEDXOFF
 #undef STAGEDXON
 #undef INJECTOR_CHANNEL_NUMBER
@@ -101,10 +103,12 @@ void StagedOffISR(void) {
 /* Channel 2 */
 #define INJECTOR_CHANNEL_NUMBER 1
 #define InjectorXISR Injector2ISR
+#define InjectorXISR_wrapped Injector2ISR_wrapped
 #define STAGEDXOFF STAGED2OFF
 #define STAGEDXON STAGED2ON
 #include "inc/injectorISR.c"
 #undef InjectorXISR
+#undef InjectorXISR_wrapped
 #undef STAGEDXOFF
 #undef STAGEDXON
 #undef INJECTOR_CHANNEL_NUMBER
@@ -112,10 +116,12 @@ void StagedOffISR(void) {
 /* Channel 3 */
 #define INJECTOR_CHANNEL_NUMBER 2
 #define InjectorXISR Injector3ISR
+#define InjectorXISR_wrapped Injector3ISR_wrapped
 #define STAGEDXOFF STAGED3OFF
 #define STAGEDXON STAGED3ON
 #include "inc/injectorISR.c"
 #undef InjectorXISR
+#undef InjectorXISR_wrapped
 #undef STAGEDXOFF
 #undef STAGEDXON
 #undef INJECTOR_CHANNEL_NUMBER
@@ -123,10 +129,12 @@ void StagedOffISR(void) {
 /* Channel 4 */
 #define INJECTOR_CHANNEL_NUMBER 3
 #define InjectorXISR Injector4ISR
+#define InjectorXISR_wrapped Injector4ISR_wrapped
 #define STAGEDXOFF STAGED4OFF
 #define STAGEDXON STAGED4ON
 #include "inc/injectorISR.c"
 #undef InjectorXISR
+#undef InjectorXISR_wrapped
 #undef STAGEDXOFF
 #undef STAGEDXON
 #undef INJECTOR_CHANNEL_NUMBER
@@ -134,10 +142,12 @@ void StagedOffISR(void) {
 /* Channel 5 */
 #define INJECTOR_CHANNEL_NUMBER 4
 #define InjectorXISR Injector5ISR
+#define InjectorXISR_wrapped Injector5ISR_wrapped
 #define STAGEDXOFF STAGED5OFF
 #define STAGEDXON STAGED5ON
 #include "inc/injectorISR.c"
 #undef InjectorXISR
+#undef InjectorXISR_wrapped
 #undef STAGEDXOFF
 #undef STAGEDXON
 #undef INJECTOR_CHANNEL_NUMBER
@@ -145,10 +155,12 @@ void StagedOffISR(void) {
 /* Channel 6 */
 #define INJECTOR_CHANNEL_NUMBER 5
 #define InjectorXISR Injector6ISR
+#define InjectorXISR_wrapped Injector6ISR_wrapped
 #define STAGEDXOFF STAGED6OFF
 #define STAGEDXON STAGED6ON
 #include "inc/injectorISR.c"
 #undef InjectorXISR
+#undef InjectorXISR_wrapped
 #undef STAGEDXOFF
 #undef STAGEDXON
 #undef INJECTOR_CHANNEL_NUMBER

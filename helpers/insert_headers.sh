@@ -1,5 +1,5 @@
 #!/bin/bash
-# $Id: insert_headers.sh 502 2015-11-05 14:18:19Z klugeflo $
+# $Id: insert_headers.sh 564 2016-07-27 10:59:18Z klugeflo $
 
 # Usage: ${0} header file
 

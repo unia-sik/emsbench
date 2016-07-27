@@ -214,7 +214,7 @@ uint16_t UB_VCP_StringRx(char *ptr, uint16_t len)
 
   // kompletten String bis zur Endekennung auslesen
   // (oder bis Puffer leer ist)
-  // es werden nur Ascii-Zeichen �bergeben
+  // es werden nur Ascii-Zeichen uebergeben
   akt_pos=0;
   do {
     temptail=(APP_tx_ptr_tail+1) & APP_TX_BUF_MASK;
@@ -227,7 +227,7 @@ uint16_t UB_VCP_StringRx(char *ptr, uint16_t len)
       akt_pos++;
     }
   }while((APP_tx_ptr_head!=APP_tx_ptr_tail) && (wert!=USB_CDC_RX_END_CHR) && (akt_pos < len));
-  // Stringende anh�ngen
+  // Stringende anhaengen
   if (akt_pos < len){
 	*(ptr+akt_pos)=0x00;
   }
