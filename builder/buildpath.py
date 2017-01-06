@@ -40,6 +40,7 @@ def makePath(platform, app):
 ###############################################################################
 
 def ensureBuildPath(platform, app, appHal):
+    ensureDirectoryExists(data.BUILD_PATH_BASE)
     path = makePath(platform, app)
     ensureCleanDirectoryExists(path)
     ensureDirectoryExists(path + '/hal')
